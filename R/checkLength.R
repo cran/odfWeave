@@ -5,6 +5,13 @@ checkLength <- function(x, cutoff = 999)
    
    lineLength <- nchar(x)
    isTooLong <- lineLength >= cutoff
+   
+   # when code is pasted in, it might put multiple lines
+   # of test into one XML entry. If these lines contain
+   # code chunks, we should not break them up
+   startLines <- grep("&lt;&lt;(.*)&gt;&gt;=", x)
+   if(length(startLines) > 0) isTooLong[startLines] <- FALSE
+   
    if(any(isTooLong))
    {
       breakPoints <- which(isTooLong)
@@ -22,9 +29,6 @@ checkLength <- function(x, cutoff = 999)
    out
 }
 
-#testing <- letters[1:10]
-#testing[3] <- paste(1:10, collapse = " ")
-#testing[7] <- paste(1:5, collapse = " ")
-#checkLength(testing, 4)
+
 
 

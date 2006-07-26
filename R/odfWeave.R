@@ -1,11 +1,33 @@
-# put in check for optimized files
-# documentation and beta testing
-# code review
-# add check for slim style file
 
 "odfWeave" <- function(file, dest, workDir = tempdir(), control = odfWeaveControl())
 {
+
+   # first, check for an unzipping utility
+   if(all(control$zipCmd == c("zip -r $$file$$ .", "unzip -o $$file$$")))
+   {
+      errorText <- paste(
+               "unzip could not be found.",
+               "If installed, check your path.",
+               "If not installed, either go to",
+               "www.info-zip.org and install or",
+               "use another utility (like jar)")
+      if(.Platform$OS.type == "windows")
+      {  
+         zipTest <- class(try(system("unzip", intern = TRUE, invisible = TRUE), silent = TRUE))
+         if(class(zipTest) == "try-error") stop(errorText)
+   
+      } else {
+         zipTest <- system("unzip", intern = TRUE)[1]
+         if(is.na(zipTest) || length(grep("UnZip", zipTest)) == 0) stop(errorText)
+      }
+   }   
+
    currentLoc <- getwd()
+   
+   currentLocale <- c(Sys.getlocale("LC_CTYPE"), Sys.getlocale("LC_COLLATE"))
+   Sys.setlocale("LC_CTYPE", "C")
+   Sys.setlocale("LC_COLLATE", "C")   
+      
    # create a temp dir (or have dir specified)
    if(!file.exists(workDir)) 
    {
@@ -112,12 +134,18 @@
             stop("Error removing xml file file") 
          if(control$verbose) cat("  Sweaving ",gsub("[Xx][Mm][Ll]", "Rnw", sweaveFiles[j]), "\n\n"); flush.console()            
          
+         Sys.setlocale("LC_CTYPE", currentLocale[1])      
+         Sys.setlocale("LC_COLLATE", currentLocale[2])             
+         
          #Sweave results to new xml file
          Sweave(
             file =   paste(workDir, "/", gsub("[Xx][Mm][Ll]", "Rnw", sweaveFiles[j]), sep = ""),
             output = paste(workDir, "/", sweaveFiles[j], sep = ""),
             quiet = !control$verbose,
             driver = RweaveOdf(), control = control)
+         
+         Sys.setlocale("LC_CTYPE", "C")
+         Sys.setlocale("LC_COLLATE", "C")            
          
          # remove sweave file
          if(control$verbose) cat("  Removing ", gsub("[Xx][Mm][Ll]", "Rnw", sweaveFiles[j]), "\n"); flush.console()           
@@ -163,6 +191,9 @@
 
    if(control$verbose) cat("  Resetting wd\n"); flush.console()
    setwd(currentLoc)
+
+   Sys.setlocale("LC_CTYPE", currentLocale[1])      
+   Sys.setlocale("LC_COLLATE", currentLocale[2])   
 
    # delete working dir
    if(control$cleanup)

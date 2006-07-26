@@ -56,7 +56,7 @@ RweaveOdfSetup(file, syntax,
       graphical output. Note that only one figure per code chunk can be
       processed this way.}
   }
-  Note that image options, such as the image type and size, are set using \code{\ref{odfWeaevControl}}.
+  Note that image options, such as the image type and size, are set using \code{\ref{odfWeaveControl}}.
   
 }
 \author{Max Kuhn, based on \code{\link{RweaveLatex}} by Friedrich Leisch}

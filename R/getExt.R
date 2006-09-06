@@ -8,7 +8,7 @@ function(x)
    } else {
       if(length(hasPeriod) < length(x)) x[-hasPeriod] <- NA
       y <- strsplit(x, ".", extend = FALSE, fixed = TRUE)
-      z <- lapply(y, function(data) data[length(data)])         
+      z <- lapply(y, function(data) data[length(data)])
    }
    unlist(z)
 }

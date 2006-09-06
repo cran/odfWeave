@@ -1,14 +1,34 @@
-figGen <- function(type, device, plotName = NULL, ...)
+figGen <- function(plotName = NULL)
 {
-   
-   # make up a random name with prefix "rPlot"
-   if(is.null(plotName)) plotName <- paste("rPlot", floor(runif(1) * 10000), ".", type, sep = "")
-   
-   deviceArgs <- vector(mode = "list", length = 0)
-   if(device != "bitmap") deviceArgs$filename <- plotName else deviceArgs$file <- plotName   
-   
-   if(length(list(...)) > 0) deviceArgs <- c(deviceArgs, list(...))
-   
-   do.call(device, deviceArgs) 
 
+   deviceArgs <- getImageDefs()
+
+   # make up a random name with prefix "rPlot"
+   if(is.null(plotName)) plotName <- paste("rPlot", floor(runif(1) * 10000), 
+      ".", deviceArgs$type, sep = "")
+
+   if(!is.null(deviceArgs$args))
+   {
+      deviceArgs <- c(deviceArgs, deviceArgs$args)
+      deviceArgs$args <- NULL
+   }
+   
+   thisDevice <- deviceArgs$device
+   deviceArgs$device <- deviceArgs$type <- NULL
+   deviceArgs$dispHeight <- deviceArgs$dispWidth <- NULL
+   
+   deviceArgs$height <- deviceArgs$plotHeight
+   deviceArgs$width <- deviceArgs$plotWidth
+   deviceArgs$plotHeight <- deviceArgs$plotWidth <- NULL   
+   
+   if(thisDevice %in% c("postscript", "bitmap")) 
+   {
+      deviceArgs$file <- plotName   
+   } else {
+      deviceArgs$filename <- plotName
+   }
+   
+   
+   do.call(thisDevice, deviceArgs) 
 }
+

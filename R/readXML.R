@@ -1,24 +1,12 @@
-
-readXML <- function(x, method = "old", verbose = TRUE)
-{
-   x <- file(x, "rb")
-   if(method == "new")
-	   {
-	   xmlRaw <- scan(x, what = "raw", sep = "\n",  strip.white = TRUE, quiet = !TRUE)
-	   xmlData <- unlist(strsplit(xmlRaw, "><"))
-	   close(x)
-	   #some xml has two bit strings as the first characters, so we split off the first line
-	   xmlStart <- xmlData[1]
-	   xmlData <- xmlData[-1]
-	
-	   xmlData <- ifelse(substr(xmlData, 1, 1) != "<", paste("<", xmlData, sep = ""), xmlData)
-	   xmlData <- ifelse(substr(xmlData, nchar(xmlData), nchar(xmlData)) != ">", paste(xmlData, ">", sep = ""), xmlData)
-	   
-	   out <- c(xmlStart, xmlData)
-   } else {
-     out <- readLines(x)
+readXML <- function(infile, method = "old", verbose = FALSE) {
+   input_get <- function (infile, verbose = TRUE) {
+      # readLines is more natural, but shows warnings due to no EOF (OO creates XML wo EOF)
+      data <- readBin(infile, what='raw', n=100000, size=1)
+      if (length(data)) c(data, input_get(infile))
+      else data
    }
-   close(x)
-   out
+   infile <- file(infile, open="rb")
+   xmlRaw <- rawToChar(input_get(infile))
+   close(infile)
+   xmlRaw
 }
-

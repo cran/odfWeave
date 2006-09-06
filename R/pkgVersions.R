@@ -1,5 +1,5 @@
 "pkgVersions" <-
-function(type = "string", ncol = 4) 
+function(type = "string", ncol = 4)
 {
    if(!(type %in% c("string", "matrix", "data frame")))
       stop("type must be either: string, matrix or data frame")
@@ -12,14 +12,14 @@ function(type = "string", ncol = 4)
    out <- switch(type,
       "data frame" = pkgDF,
       string = listString(pkgString, verbose = FALSE),
-      matrix = 
+      matrix =
       {
          sizeDelta <- length(pkgString)%%ncol
          if(sizeDelta > 0)   out <- c(pkgString, rep("", ncol - length(pkgString) %% ncol))
             else out <- pkgString
-         out <- matrix(out, ncol = ncol)      
+         out <- matrix(out, ncol = ncol)
          out
       })
-  
+
    out
 }

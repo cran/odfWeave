@@ -2,13 +2,13 @@
 function(x, period = FALSE, verbose = TRUE)
 {
    if(verbose) cat("\n      entering listString\n")
-   flush.console()  
-   
+   flush.console()
+
    if(!is.character(x))  x <- as.character(x)
-   
+
    numElements <- length(x)
    out <- if(length(x) > 0)
-   { 
+   {
       switch(
          min(numElements, 3),
          x,
@@ -21,12 +21,12 @@ function(x, period = FALSE, verbose = TRUE)
                   " and",
                   ""),
                sep = "")
-            paste(x, collapse = " ")    
+            paste(x, collapse = " ")
          })
    } else ""
-   
+
    if(period) out <- paste(out, ".", sep = "")
    if(verbose) cat("      leaving  listString\n\n")
-   flush.console()     
+   flush.console()
    out
 }

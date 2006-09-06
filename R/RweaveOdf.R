@@ -1,4 +1,3 @@
-
 RweaveOdf <- function()
 {
     list(setup = RweaveOdfSetup,
@@ -147,14 +146,11 @@ RweaveOdfRuncode <- function(object, chunk, options, control)
 
     if(options$fig && options$eval)
     {
-         imageName <- paste("./Pictures/", chunkprefix, ".", options$control$plotType, sep = "")
+         deviceInfo <- getImageDefs()
+         
+         imageName <- paste("./Pictures/", chunkprefix, ".", deviceInfo$type, sep = "")
 
-         figGen(
-            type = options$control$plotType,
-            device = options$control$plotDevice,
-            plotName = imageName,
-            width = options$control$plotWidth,
-            height = options$control$plotHeight)    
+         figGen(plotName = imageName)    
             
          err <- try({SweaveHooks(options, run=TRUE);
                      eval(chunkexps, envir=.GlobalEnv)})
@@ -166,8 +162,8 @@ RweaveOdfRuncode <- function(object, chunk, options, control)
          plotMarkup <- odfInsertPlot(
             imageName, 
             name = gsub("-", "", chunkprefix),            
-            height = options$control$dispHeight, 
-            width = options$control$dispWidth) 
+            height = deviceInfo$dispHeight, 
+            width = deviceInfo$dispWidth) 
          cat(plotMarkup, file=chunkout, append=TRUE)
    
     }

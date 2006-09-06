@@ -93,7 +93,7 @@ One advantage to using \texttt{Sweave} with ODF files is that no experience with
 
 Users can create documents with \texttt{Sweave} commands in ODF using (almost) exactly the same format as required when using \LaTeX{} markup. A basic call to \odfWeaveFunc looks like
 \begin{verbatim}
-odfWeave(inFile, outFile, workDir = tempdir(), control = odfWeaveControl())
+odfWeave(inFile, outFile, workDir = odfTmpDir(), control = odfWeaveControl())
 \end{verbatim}
 where \texttt{inFile} and \texttt{outFile} are the source and destination file names, \texttt{workDir} is a path where the files are processed and \texttt{control} is a control object that can be used to specify image formats and style specifications. The functionality of \odfWeave is described in more detail later.
 
@@ -148,7 +148,6 @@ Additionally, the files contained in the compressed archive include:
 \item {\bf \tt settings.xml} lists the configuration of the document, such as the zoom when opened or printing options.
 \item {\bf \tt styles.xml} has formatting information for almost all of the elements in the document, such as fonts or table formatting.
 \end{itemize}
-when using OpenOffice, the XML files can be formatted one of two ways. If the "Size optimization for XML format" option is checked in (\texttt{Tools:Options:Load/Save:General}), there are almost no linebreaks. If that option is not checked, the XML file is nicely formatted with linebreaks. {\bf \odfWeave  requires that this option not be set} (although future versions will be able to deal with this).
 
 Since ODF is based on XML, the underlying markup tends to be very verbose. For example, the in--line \texttt{Sweave} expression:
 \begin{quote}
@@ -206,7 +205,35 @@ The functionality of \texttt{Sweave} is mostly preserved in \texttt{odfWeave}, s
 
 In--line \texttt{Sweave} expressions are created using \verb|\Sexpr|. Code chunks can be created with the noweb convention (using \verb|<<>>=|). The \LaTeX{} code chunk syntax is not currently supported.
 
-The image format and sizes are specified within the \texttt{control} object. The dimensions of the image file and the dimensions of the rendered image can be set independently.
+The image format and sizes are specified using \texttt{getImageDefs} and \texttt{setImageDefs}. For example:
+\begin{Verbatim}[samepage=true]
+> getImageDefs()
+$type
+[1] "png"
+
+$device
+[1] "png"
+
+$plotHeight
+[1] 480
+
+$plotWidth
+[1] 480
+
+$dispHeight
+[1] 5
+
+$dispWidth
+[1] 5
+
+$args
+list()
+\end{Verbatim}
+
+This shows that the type of image to generate is "png" via the \texttt{png} device driver. The \texttt{plotHeight} and \texttt{plotWidth} values are set in the units of the particular device driver (pixels in this case, but other devices use inches). The dimensions of the image file and the dimensions of the rendered image can be set independently using \texttt{dispHeight} and \texttt{dispWidth} (always in inches). The \texttt{args} element is a list of graphics device arguments. For example, when using postscript graphics, you might need to use the options \texttt{horizontal = FALSE}, \texttt{onefile = FALSE} and \texttt{paper = "special"}.
+
+To change the defaults, this list can be saved and edited. The modified version can be used via \texttt{setImageDefs(modObject)}, where \texttt{modObject} is a modified version of the above list. This can be done prior to calling \texttt{odfWeave} or can be set in--between figure code chunks.
+
 
 The \texttt{odfTable} class can be used to convert vectors, matrices and data frames to native ODF tables, much like the \texttt{latex} function in the \texttt{Hmisc} package. The \texttt{odfCat} can be used to write out text in native ODF format. There are also functions to created bulleted lists and inserting external images (i.e. images not created in a chunk with \texttt{fig = TRUE}). 
 
@@ -216,17 +243,18 @@ library(odfWeave)
 inFile <- "example.odt"
 outFile <- "out.odt"
 
-newCntl <- odfWeaveControl(
-   dispWidth = 4.5, 
-   dispHeight = 4.5)
+imageDefs <- getImageDefs()
+imageDefs$dispWidth <- 4.5
+imageDefs$dispHeight<- 4.5
+setImageDefs(imageDefs)
 
-odfWeave(inFile, outFile, control = newCntl)
+odfWeave(inFile, outFile)
 \end{verbatim}
 Figure \ref{figure:after} shows the results. Note that since the first in--line \texttt{Sexpr} command had uniform formatting, the output of that command retained the formatting. In general, the formatting of in--line \texttt{Sweave} tags and code chunks is required to be uniform (as an error is likely to be produced otherwise). For example,  \texttt{round({\it sqrt(2)}, 2)}, ends up looking like
       
       {\center \small \verb+<text:p>round(<text:span text:style-name="T10">sqrt(2)</text:span>, 2)</text:p>+}
       
-and can be difficult to process and parse.
+\noindent and can be difficult to process and parse.
 
 One additional note about this example: the initial code chunk that loads the data does not specify the full path to the file. In this example, the source data were previously zipped into the ODF file (using \texttt{zip example.odt pcrData.csv}) so that the source data are embedded with the analysis and report. Once the file is processed using \texttt{odfWeave}, the resulting document also contains the source data in its original form. 
 

@@ -5,7 +5,7 @@
   Sweave processing of Open Document Format files
 }
 \usage{
-odfWeave(file, dest, workDir = tempdir(), control = odfWeaveControl())
+odfWeave(file, dest, workDir = odfTmpDir(), control = odfWeaveControl())
 }
 \arguments{
   \item{file}{the ODF file created using OpenOffice V2.0 or above.}
@@ -32,6 +32,17 @@ current version,  \code{odfWeave} processing of presentations and
 spreadsheets should be considered to be experimental (but should be
 supported in subsequent versions). 
 
+Since ODF files are compressed archives of files and directories, R
+will need to zip and unzip the source file. While R has an unzip
+utility, it does not have one for re-zipping files, so an external
+application is needed. \code{unzip} and \code{zip} are free utilities located at 
+
+\url{http://www.info-zip.org/}
+
+Also, \code{jar} can be used. See \code{link{odfWeaveControl}} for more
+information on configuring \code{odfWeave} to use applications other than
+\code{zip} and \code{unzip}. 
+
 The functionality of \code{\link[utils]{Sweave}} is mostly preserved in
 \code{odfWeave}, such as weaving, hooks, figure environments, etc. Some
 functionality, such as writing output to separate files for each code
@@ -44,8 +55,9 @@ should be in \code{\Sexpr} calls and block code chunks should use the
 \code{<<>>=} syntax (i.e. no Latex syntax will currently work).
 
 
-The image format and sizes are specified within the \code{\link{odfWeaveControl}} object. The dimensions of the image file and the dimensions of the rendered image can be set independently. See \code{\link{odfWeaveControl}} for more details.
-
+The image format and sizes are specified using \code{\link{setImageDefs}}.
+The dimensions of the image file and the dimensions of the rendered
+image can be set independently. See \code{\link{setImageDefs}} for more details.
 }
 \value{
 an ODF file with the R output
@@ -64,10 +76,8 @@ demoFile <- system.file("examples", "testCases.odt", package = "odfWeave")
 
 demoFile <- system.file("examples", "simple.odt", package = "odfWeave")
 outputFile <- gsub("simple.odt", "output.odt", demoFile)
- 
-workingPath <- tempdir()
 
 library(odfWeave)
-odfWeave(demoFile, outputFile, workingPath)
+odfWeave(demoFile, outputFile)
 }
 \keyword{utilities}

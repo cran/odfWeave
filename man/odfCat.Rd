@@ -27,9 +27,7 @@ odfCat(..., sep = " ", trim = FALSE,
 \code{\link{cat}} uses an internal function, so there will be some differences between \code{\link{cat}} and \code{odfCat}. For example, factors are naively converted to character and numeric data are converted to character.
 
 Since the text is embedded in ODF tags escaped characters
-(e.g. \code{\n}) don't have any effect. Exceptions are \code{\"} and \code{\'}.
-  
-     }
+(e.g. \code{\\n}) don't have any effect. Exceptions are \code{\\"} and \code{\\'}.}
 \value{
 a character strng of class \code{odfCat}}
 }
@@ -38,7 +36,7 @@ a character strng of class \code{odfCat}}
 \seealso{\code{\link{cat}}, \code{\link{format}} }
 \examples{
 odfCat("\"hello world\"")
-odfCat("this are the first letters", letters[1:5])
+odfCat("these are the first letters", letters[1:5])
 odfCat("some random normal data:", rnorm(5))
 
 }

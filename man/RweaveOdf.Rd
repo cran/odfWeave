@@ -29,7 +29,7 @@ RweaveOdfSetup(file, syntax,
   \item{\ldots}{optional arguments. This is used to pass the control object to the driver}  
 }
 \section{Supported Options}{
-  RweaveOdf supports the following options for code chunks (the values
+   \code{\link{RweaveOdf}} supports the following options for code chunks (the values
   in parentheses show the default values):
   \describe{
     \item{echo:}{logical (\code{TRUE}). Include S code in the
@@ -39,8 +39,8 @@ RweaveOdfSetup(file, syntax,
     \item{results:}{character string (\code{verbatim}).
       If \code{verbatim}, the output of S commands is
       included in the verbatim-like Soutput environment. If
-      \code{xml}, the output is taken to be already proper latex markup
-      and included as is. If \code{hide} then all output is
+      \code{xml}, the output is taken to be already proper XML markup
+      and included as is. If \code{hide}, then all output is
       completely suppressed (but the code executed during the weave).}
     \item{print:}{logical (\code{FALSE})
       If \code{TRUE}, each expression in the
@@ -56,10 +56,10 @@ RweaveOdfSetup(file, syntax,
       graphical output. Note that only one figure per code chunk can be
       processed this way.}
   }
-  Note that image options, such as the image type and size, are set using \code{\ref{odfWeaveControl}}.
+  Note that image options, such as the image type and size, are set using \code{\link{setImageDefs}}.
   
 }
 \author{Max Kuhn, based on \code{\link{RweaveLatex}} by Friedrich Leisch}
 
-\seealso{\code{\link[utils]{Sweave}}, \code{\link{odfWeave}}}
+\seealso{\code{\link[utils]{Sweave}}, \code{\link{odfWeave}}, \code{\link{setImageDefs}}}
 \keyword{utilities}

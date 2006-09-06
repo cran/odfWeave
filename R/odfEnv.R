@@ -4,6 +4,22 @@
 
 # todo: style values should be validated
 
+
+assign(
+   "imageDefs",  
+   list(
+   
+      type = "png",
+      device = if(capabilities("png")) "png" else "bitmap",
+      plotHeight = if(capabilities("png")) 480 else 480/72,
+      plotWidth = if(capabilities("png")) 480 else 480/72,      
+      dispHeight = 5,
+      dispWidth = 5,      
+      args = list()
+      ), 
+   env = .odfEnv)
+   
+
 assign(
    "odfStyles",  
    list(
@@ -118,5 +134,5 @@ assign(
          minLabelWidth="0.25in",
          fontName="StarSymbol")),
    env = .odfEnv)  
-   
+
 

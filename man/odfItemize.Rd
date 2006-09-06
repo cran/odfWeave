@@ -12,7 +12,7 @@ odfItemize(data)
 }
 
 \value{
-a string
+a string of XML markup
 }
 \author{Max Kuhn}
 

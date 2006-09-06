@@ -13,25 +13,22 @@ Create an Open Document Format table from a data frame, matrix or vector
 \usage{
 odfTable(x, ...)
 
-odfTable.numeric(x, horizontal = length(x) < 5, colnames = names(x), 
+\method{odfTable}{numeric}(x, horizontal = length(x) < 5, colnames = names(x), 
+   digits = max(3, getOption("digits") - 3), 
+   name = paste("Table", floor(runif(1) * 1000), sep = ""), 
+   styles = NULL, ...)
+  
+\method{odfTable}{character}(x, horizontal = length(x) < 5, colnames = names(x), 
+   name = paste("Table", floor(runif(1) * 1000), sep = ""), 
+   styles = NULL, ...)
+   
+  
+\method{odfTable}{data.frame}(x, colnames = NULL, useRowNames = TRUE, 
    digits = max(3, getOption("digits") - 3), 
    name = paste("Table", floor(runif(1) * 1000), sep = ""), 
    styles = NULL, ...)
    
-odfTable.character(x, horizontal = length(x) < 5, colnames = names(x), 
-   name = paste("Table", floor(runif(1) * 1000), sep = ""), 
-   styles = NULL, ...)
-   
-odfTable.character(x, horizontal = length(x) < 5, colnames = names(x), 
-   name = paste("Table", floor(runif(1) * 1000), sep = ""), 
-   styles = NULL, ...)
-   
-odfTable.data.frame(x, colnames = NULL, useRowNames = TRUE, 
-   digits = max(3, getOption("digits") - 3), 
-   name = paste("Table", floor(runif(1) * 1000), sep = ""), 
-   styles = NULL, ...)
-   
-odfTable.matrix(x, colnames = NULL, useRowNames = TRUE, 
+\method{odfTable}{matrix}(x, colnames = NULL, useRowNames = TRUE, 
    digits = max(3, getOption("digits") - 3),
     name = paste("Table", floor(runif(1) * 1000), sep = ""), 
     styles = NULL, ...)
@@ -47,7 +44,16 @@ odfTable.matrix(x, colnames = NULL, useRowNames = TRUE,
   \item{\dots}{optional arguments that can be passed to \code{format}}
 }
 \details{
-There are two main components to specifying output formats: style definitions and style assignments. The definition has the specific components (such as a table cell) and their format values (e.g. boxed with solid black lines). The function \code{\link{getStyleDefs}} can fetch the pre-existing styles in the package. These can be modified and new definitions can be added. The function \code{\link{setStyleDefs}} ``registers'' the style changes with the package. When \code{\link{odfWeave}} is called, these definitions are written to the style sections of the XML files. There is a second mechanism to assign  styles to specific output elements. The functions\code{\link{getStyles}} and \code{\link{setStyles}} can be used to tell odfWeave which style definition to use for a particular output
+There are two main components to specifying output formats: style
+definitions and style assignments. The definition has the specific
+components (such as a table cell) and their format values (e.g. boxed
+with solid black lines). The function \code{\link{getStyleDefs}} can
+fetch the pre-existing styles in the package. These can be modified and
+new definitions can be added. The function \code{\link{setStyleDefs}}
+``registers'' the style changes with the package. When
+\code{\link{odfWeave}} is called, these definitions are written to the
+style sections of the XML files. There is a second mechanism to assign
+styles to specific output elements. The functions \code{\link{getStyles}} and \code{\link{setStyles}} can be used to tell odfWeave which style definition to use for a particular output
 
 The data structures are converted to character matrices using format.
 }

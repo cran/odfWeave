@@ -30,7 +30,7 @@
             if(length(grep("bold", thisStyle$fontType)))
                fontText <- c(fontText, tagattr("fo:font-weight", "bold"))
             if(length(grep("italic", thisStyle$fontType)))
-               fontText <- c(fontText, tagattr("fo:font-style=", "italic"))
+               fontText <- c(fontText, tagattr("fo:font-style", "italic"))
             if(length(grep("underline", thisStyle$fontType)))
                fontText <- c(
                   fontText,
@@ -189,3 +189,4 @@
    }
    out
 }
+

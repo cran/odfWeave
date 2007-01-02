@@ -14,6 +14,9 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    
    verbose <- control$verbose
 
+   # check for input file
+   if(!file.exists(file)) stop(paste("Cannot find the input file:", file))
+
    #check for an unzipping utility
    if(all(zipCmd == c("zip -r $$file$$ .", "unzip -o $$file$$")))
    {
@@ -132,6 +135,9 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
             quiet = !control$verbose,
             driver = RweaveOdf(), control = control)
 
+         #in case people use setwd in their code:
+         setwd(workDir)
+         
          Sys.setlocale("LC_CTYPE", "C")
          Sys.setlocale("LC_COLLATE", "C")
 
@@ -292,7 +298,10 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
 
       #verbose regular expression, but lazy evaluation down the list of
       #alternative expressions avoids most recursion
-      out2 <- gregexpr("(?s)(?U)<text:p([^<]|<[^t]|<t[^e]|<te[^x]|<tex[^t]|<text[^:]|text: [^p])*&lt;&lt;(?:(?!&gt;&gt(?!=)).)*&gt;&gt;=.*>@<(/text:p>|.*</text:p>)", x, perl=TRUE)
+      ##(replaced 2006-10-13)## out2 <- gregexpr("(?s)(?U)<text:p([^<]|<[^t]|<t[^e]|<te[^x]|<tex[^t]|<text[^:]|text: [^p])*&lt;&lt;(?:(?!&gt;&gt(?!=)).)*&gt;&gt;=.*>@<(/text:p>|.*</text:p>)", x, perl=TRUE)
+		#Thanks to Philip Hazel for this example of eliminating regular
+		#expression backtraking into runs of non-< and non-& characters
+      out2 <- gregexpr("(?s)(?U)<text:p((?>[^<&]*)(?(?=<text:p)(?!)|.))*&lt;&lt;(?:(?!&gt;&gt(?!=)).)*&gt;&gt;=.*>@[ \t]*<(/text:p>|.*</text:p>)", x, perl=TRUE)
       attR(out2, matchtype) <- "chunk"
       announce(verbose, "  Regular Expression:  SweaveOpts\n")
       out3 <- gregexpr("(?s)\\\\SweaveOpts\\{[^\\}]*?\\}", x, perl=TRUE)

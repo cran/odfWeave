@@ -8,6 +8,7 @@ function(
    styles = NULL,
    ...)
 {
+   if(!is.null(colnames)) colnames <- odfTranslate(colnames, toR = FALSE)  
    xMat <- if(horizontal) as.matrix(t(x)) else as.matrix(x)
    colTypes <- apply(xMat, 2, odfDataType)
    xChar <- format(xMat, digits = digits, ...)

@@ -10,7 +10,7 @@ odfWeave(file, dest, workDir = odfTmpDir(), control = odfWeaveControl())
 \arguments{
   \item{file}{the ODF file created using OpenOffice V2.0 or above.}
   \item{dest}{path to put the processed file (should include file name and extension)}  
-  \item{workDir}{a path to a directory where the source file will be unpacked and processed}
+  \item{workDir}{a path to a directory where the source file will be unpacked and processed.  If it does not exist, it will be created.  If it exists, it should be empty, since all its contents will be included in the generated file.}
   \item{control}{a list of control settings.  See
     \code{\link{odfWeaveControl}}
     for the names of the settable control values and their effects.}
@@ -19,8 +19,8 @@ odfWeave(file, dest, workDir = odfTmpDir(), control = odfWeaveControl())
 \code{odfWeave} can be used to embed R code within a word processing
 document. The \code{odfWeave} package was created so that the
 functionality
-of \code{\link[utils]{Sweave}} can used to generate documents
-that the end--user can easily edit. 
+of \code{\link[utils]{Sweave}} can be used within a rich editor like
+OpenOffice.  The generated document can also easily be edited.
 
 The markup language used is the Open Document Format (ODF), which is an
 open, non--proprietary format that  encompasses text documents,
@@ -51,7 +51,7 @@ ODF. See \code{\link{RweaveOdf}} for more details about the available
 options.
 
 \code{odfWeave} uses the noweb convention for R code. In-line R commands
-should be in \code{\Sexpr} calls and block code chunks should use the
+should be in \code{\Sexpr} calls.  the \code{Sexpr} text should all be completely in one visual format.  E.g., changing the color of part of the \code{Sexpr} could result in an error. Block code chunks should use the
 \code{<<>>=} syntax (i.e. no Latex syntax will currently work).
 
 

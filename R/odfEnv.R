@@ -15,7 +15,7 @@ assign(
       plotWidth = if(capabilities("png")) 480 else 480/72,      
       dispHeight = 5,
       dispWidth = 5,      
-      args = list()
+      args = list()     
       ), 
    env = .odfEnv)
    

@@ -8,7 +8,7 @@ function(
    styles = NULL,
    ...)
 {
-
+   if(!is.null(colnames)) colnames <- odfTranslate(colnames, toR = FALSE)
    colTypes <- apply(x, 2, odfDataType)
    xChar <- format(x, digits = digits, ...)
    if(useRowNames & !is.null(rownames(x)))

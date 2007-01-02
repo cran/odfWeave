@@ -7,6 +7,7 @@ function(
    styles = NULL,
    ...)
 {
+   if(!is.null(colnames)) colnames <- odfTranslate(colnames, toR = FALSE)
    xMat <- if(horizontal) as.matrix(t(x)) else as.matrix(x)
    colTypes <- apply(xMat, 2, odfDataType)
    xChar <- format(xMat, ...)
@@ -27,6 +28,7 @@ function(
    styles = NULL,
    ...)
 {
+   if(!is.null(colnames)) colnames <- odfTranslate(colnames, toR = FALSE)
    odfTable.character(as.character(x), horizontal = horizontal, colnames = colnames, name = name, styles = styles, ...)
 }
 

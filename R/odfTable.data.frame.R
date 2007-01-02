@@ -8,6 +8,7 @@ function(
    styles = NULL,
    ...)
 {
+   if(!is.null(colnames)) colnames <- odfTranslate(colnames, toR = FALSE)  
    colTypes <- unlist(lapply(x, odfDataType))
    xChar <- as.matrix(format(x, digits = digits, ...))
    if(useRowNames & !is.null(rownames(x)))

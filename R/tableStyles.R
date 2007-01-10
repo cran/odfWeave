@@ -1,8 +1,10 @@
-tableStyles <- function(x, header = NULL)
+tableStyles <- function(x, useRowNames = TRUE, header = NULL)
 {
 
    styles <- getStyles()
    tableDim <- dim(x)
+   if(useRowNames) tableDim[2] <- tableDim[2] + 1
+   
    has <- function(x) !is.null(x) && x != ""
 
 
@@ -19,7 +21,6 @@ tableStyles <- function(x, header = NULL)
 
 
    } else headerText <- headerCell <- NULL
-
 
    list(table = styles$table, text = textForm, cell = cellForm, header = headerText, headerCell = headerCell)
 }

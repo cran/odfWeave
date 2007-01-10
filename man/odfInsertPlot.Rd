@@ -9,7 +9,7 @@ the image file to the Picture directory.
 odfInsertPlot(file, height, width, units = "in", anchor =
               c("<text:p>", "</text:p>"), name = paste("graphics",
               floor(runif(1) * 1000), sep = ""), externalFile =
-              FALSE, dest = paste(getwd(), "/Pictures", sep = ""))
+              FALSE, dest = get("picPath", envir = .odfEnv))
 }
 \arguments{
   \item{file}{a string for the image file location}

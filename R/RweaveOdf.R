@@ -148,7 +148,13 @@ RweaveOdfRuncode <- function(object, chunk, options, control)
     {
          deviceInfo <- getImageDefs()
          
-         imageName <- paste("./Pictures/", chunkprefix, ".", deviceInfo$type, sep = "")
+         imageName <- paste(
+            get("picPath", envir = .odfEnv), 
+            "/", 
+            chunkprefix, 
+            ".", 
+            deviceInfo$type, 
+            sep = "")
 
          figGen(plotName = imageName)    
             

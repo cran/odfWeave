@@ -4,6 +4,10 @@
 
 # todo: style values should be validated
 
+assign(
+   "picPath",  
+   NA, 
+   env = .odfEnv)
 
 assign(
    "imageDefs",  
@@ -26,7 +30,7 @@ assign(
       paragraph = "ArialNormal",
       input = "ttRed",
       output = "ttBlue",  
-      table = "Rtable1",
+      table = "RTable1",
       cell = "noBorder",
       header = "lowerBorder",
       cellText = "ArialCentered",
@@ -123,7 +127,8 @@ assign(
          marginLeft = "0.05in",
          marginRight = "0.05in",
          marginTop = "0.05in",
-         marginBottom = "0.05in"),
+         marginBottom = "0.05in",
+         align = "margins"),
          
       Rbullet = list(
          type = "Bullet List",

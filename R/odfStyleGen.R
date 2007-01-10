@@ -84,32 +84,6 @@
          )
       }
 
-      tableStyles <- styles[styles == "Table"]
-      for(i in seq(along = tableStyles)) {
-         thisStyle <- x[[names(tableStyles)[i]]]
-         style_style <- 'style:style'
-         style_style_attr <- c(
-            tagattr("style:name", paste(names(tableStyles)[i], collapse=" ")),
-            tagattr("style:family", "table"))
-         table_properties <- 'table_properties'
-         table_properties_attr <- c(
-            if(has(thisStyle$marginLeft))
-               tagattr("fo:margin-left", thisStyle$marginLeft),
-            if(has(thisStyle$marginRight))
-               tagattr("fo:margin-right", thisStyle$marginRight),
-            if(has(thisStyle$marginTop))
-               tagattr("fo:margin-top", thisStyle$marginTop),
-            if(has(thisStyle$marginBottom))
-               tagattr("fo:margin-bottom", thisStyle$marginBottom))
-         out <- paste(
-            c(
-               out,
-               element(style_style, style_style_attr,
-                  element(table_properties, table_properties_attr))
-            ),
-            collapse="")
-      }
-
       bulletStyles <- styles[styles == "Bullet List"]
       for(i in seq(along = bulletStyles))
       {
@@ -152,6 +126,36 @@
             collapse="")
       }
    } else {
+   
+
+      tableStyles <- styles[styles == "Table"]
+      for(i in seq(along = tableStyles)) {
+         thisStyle <- x[[names(tableStyles)[i]]]
+         style_style <- 'style:style'
+         style_style_attr <- c(
+            tagattr("style:name", paste(names(tableStyles)[i], collapse=" ")),
+            tagattr("style:family", "table"))
+         table_properties <- 'style:table-properties'
+         table_properties_attr <- c(
+            if(has(thisStyle$marginLeft))
+               tagattr("fo:margin-left", thisStyle$marginLeft),
+            if(has(thisStyle$marginRight))
+               tagattr("fo:margin-right", thisStyle$marginRight),
+            if(has(thisStyle$marginTop))
+               tagattr("fo:margin-top", thisStyle$marginTop),
+            if(has(thisStyle$marginBottom))
+               tagattr("fo:margin-bottom", thisStyle$marginBottom),
+            if(has(thisStyle$align))
+               tagattr("table:align", thisStyle$align))
+         out <- paste(
+            c(
+               out,
+               element(style_style, style_style_attr,
+                  element(table_properties, table_properties_attr))
+            ),
+            collapse="")
+      }
+   
       cellStyles <- styles[styles == "Table Cell"]
       for(i in seq(along = cellStyles))
       {
@@ -173,7 +177,9 @@
             if(has(thisStyle$bottomBorder))
                tagattr("fo:border-bottom", thisStyle$bottomBorder),
             if(has(thisStyle$padding))
-               tagattr("fo:padding", thisStyle$padding)
+               tagattr("fo:padding", thisStyle$padding),
+            if(has(thisStyle$backgroundColor))
+               tagattr("fo:background-color", thisStyle$backgroundColor)               
          )
          out <- paste(
             c(

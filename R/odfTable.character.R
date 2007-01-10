@@ -12,7 +12,7 @@ function(
    colTypes <- apply(xMat, 2, odfDataType)
    xChar <- format(xMat, ...)
 
-   if(is.null(styles))    styles <- tableStyles(xChar, colnames)
+   if(is.null(styles))    styles <- tableStyles(xChar, useRowNames = FALSE, colnames)
 
    tbleText <- odfTableGen(xChar, colTypes, header = colnames, tableName = name, styles)
    structure(tbleText, class = "odfTable")

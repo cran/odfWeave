@@ -22,7 +22,7 @@ function(
       stop("wrong length of column names")
    if(!is.null(colnames)) dimnames(xChar)[[2]] <- colnames
 
-   if(is.null(styles))    styles <- tableStyles(xChar, dimnames(xChar)[[2]])
+   if(is.null(styles))    styles <- tableStyles(xChar, useRowNames = FALSE, dimnames(xChar)[[2]])
 
    tbleText <- odfTableGen(xChar, dataType = colTypes, header = dimnames(xChar)[[2]], tableName = name, styles)
    structure(tbleText, class = "odfTable")

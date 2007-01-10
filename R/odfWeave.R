@@ -14,9 +14,6 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    
    verbose <- control$verbose
 
-   # check for input file
-   if(!file.exists(file)) stop(paste("Cannot find the input file:", file))
-
    #check for an unzipping utility
    if(all(zipCmd == c("zip -r $$file$$ .", "unzip -o $$file$$")))
    {
@@ -78,6 +75,10 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
       picDir <- dir.create("Pictures", showWarnings = TRUE, recursive = FALSE)
       if(!picDir)  stop("Error creating Pictures directory")
    }
+   assign(
+      "picPath",  
+      paste(workDir, "/Pictures", sep = ""), 
+      env = .odfEnv)
 
    # find xml files
    fileList <- list.files(workDir)
@@ -135,9 +136,6 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
             quiet = !control$verbose,
             driver = RweaveOdf(), control = control)
 
-         #in case people use setwd in their code:
-         setwd(workDir)
-         
          Sys.setlocale("LC_CTYPE", "C")
          Sys.setlocale("LC_COLLATE", "C")
 
@@ -174,6 +172,11 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
 
    Sys.setlocale("LC_CTYPE", currentLocale[1])
    Sys.setlocale("LC_COLLATE", currentLocale[2])
+
+   assign(
+      "picPath",  
+      NA, 
+      env = .odfEnv)
 
    # delete working dir
    if(control$cleanup)

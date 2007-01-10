@@ -4,7 +4,7 @@ function(file, height, width,
    anchor = c("<text:p>", "</text:p>"),
    name = paste("graphics", floor(runif(1) * 1000), sep = ""),
    externalFile = FALSE,
-   dest = paste(getwd(), "/Pictures", sep = ""))
+   dest = get("picPath", envir = .odfEnv))
 {
 
    if(getExt(file) %in% c("pdf")) stop("graphics format not supported")

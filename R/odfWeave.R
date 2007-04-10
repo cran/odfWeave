@@ -198,7 +198,7 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
 } 
 
 "attR<-" <- function (x, name, value) {
-   #apply an attribute lists in a list
+   #apply an attribute to lists in a list
    #value always gets unlisted before assignment
    if( (length(value) != length(x)) || (length(value) == 1))
       lapply(x, function(x) {attr(x, name) <- value[[1]]; x})
@@ -303,8 +303,8 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
       #alternative expressions avoids most recursion
       ##(replaced 2006-10-13)## out2 <- gregexpr("(?s)(?U)<text:p([^<]|<[^t]|<t[^e]|<te[^x]|<tex[^t]|<text[^:]|text: [^p])*&lt;&lt;(?:(?!&gt;&gt(?!=)).)*&gt;&gt;=.*>@<(/text:p>|.*</text:p>)", x, perl=TRUE)
 		#Thanks to Philip Hazel for this example of eliminating regular
-		#expression backtraking into runs of non-< and non-& characters
-      out2 <- gregexpr("(?s)(?U)<text:p((?>[^<&]*)(?(?=<text:p)(?!)|.))*&lt;&lt;(?:(?!&gt;&gt(?!=)).)*&gt;&gt;=.*>@[ \t]*<(/text:p>|.*</text:p>)", x, perl=TRUE)
+		#expression backtracking into runs of non-< and non-& characters
+      out2 <- gregexpr("(?s)(?U)<text:p((?>[^<&]*)(?(?=<text:p)(?!)|.))*&lt;&lt;(?:(?!&gt;&gt;(?!=)).)*&gt;&gt;=.*>@[ \t]*<(/text:p>|.*</text:p>)", x, perl=TRUE)
       attR(out2, matchtype) <- "chunk"
       announce(verbose, "  Regular Expression:  SweaveOpts\n")
       out3 <- gregexpr("(?s)\\\\SweaveOpts\\{[^\\}]*?\\}", x, perl=TRUE)

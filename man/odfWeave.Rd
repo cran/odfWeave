@@ -51,7 +51,9 @@ ODF. See \code{\link{RweaveOdf}} for more details about the available
 options.
 
 \code{odfWeave} uses the noweb convention for R code. In-line R commands
-should be in \code{\Sexpr} calls.  the \code{Sexpr} text should all be completely in one visual format.  E.g., changing the color of part of the \code{Sexpr} could result in an error. Block code chunks should use the
+should be in \code{\Sexpr} calls.  the \code{Sexpr} text should all be
+completely in one visual format.
+e.g., changing the color of part of the \code{Sexpr} could result in an error. Block code chunks should use the
 \code{<<>>=} syntax (i.e. no Latex syntax will currently work).
 
 
@@ -71,7 +73,8 @@ an ODF file with the R output
 
 \dontrun{
 demoFile <- system.file("examples", "examples.odt", package = "odfWeave")
-demoFile <- system.file("examples", "testCases.odt", package = "odfWeave")
+demoFile <- system.file("examples", "testCases.odt", package ="odfWeave")
+demoFile <- system.file("examples", "formatting.odt", package = "odfWeave")
 }
 
 demoFile <- system.file("examples", "simple.odt", package = "odfWeave")
@@ -79,5 +82,71 @@ outputFile <- gsub("simple.odt", "output.odt", demoFile)
 
 library(odfWeave)
 odfWeave(demoFile, outputFile)
+
+\dontshow{
+   odfWeave(
+      system.file("examples", "examples.odt", package = "odfWeave"),
+      gsub(
+         "examples.odt", "examplesOut.odt",
+         system.file("examples", "examples.odt", package = "odfWeave"),
+         fixed = TRUE))
+
+   odfWeave(
+      system.file("examples", "testCases.odt", package = "odfWeave"),
+      gsub(
+         "testCases.odt", "testCasesOut.odt",
+         system.file("examples", "examples.odt", package = "odfWeave"),
+         fixed = TRUE))
+
+   require(stats)
+   attach(environmental)
+   data(state)
+   
+   options(width = 90)
+   
+   basicStyles <- getStyleDefs()
+   
+   basicStyles$lowerBorder$backgroundColor <-  "#FFFFFF"
+   
+   basicStyles$lowerBorderGray <-  basicStyles$lowerBorder
+   basicStyles$lowerBorderGray$backgroundColor <-  "#E8E8E8"
+   
+   basicStyles$ArialCenteredItalics <- basicStyles$ArialCenteredBold
+   basicStyles$ArialCenteredItalics$fontSize <- "10 pt"
+   basicStyles$ArialCenteredItalics$fontType <- "italic"
+   
+   basicStyles$ArialHighlight$fontColor <- "#000080"
+   basicStyles$ArialHighlight$fontType <- ""
+   
+   basicStyles$highlight <- basicStyles$noBorder
+   basicStyles$highlight$backgroundColor <- "#D4EBF3"
+   
+   basicStyles$RTable2 <- basicStyles$RTable1
+   basicStyles$RTable2$marginLeft <- "1.5in"
+   basicStyles$RTable2$marginRight <- "1.5in"
+   basicStyles$RTable2$marginTop <- "1in"
+   basicStyles$RTable2$marginBottom <- "2in"
+   
+   basicStyles$ttRed$fontSize <- "9pt"
+   basicStyles$ttBlue$fontSize <- "9pt"
+   
+   setStyleDefs(basicStyles)
+   
+   plotInfo <- getImageDefs()
+   plotInfo$dispHeight <- 4  
+   plotInfo$dispWidth <- 4 
+   setImageDefs(plotInfo)
+
+   odfWeave(
+      system.file("examples", "formatting.odt", package = "odfWeave"),
+      gsub(
+         "formatting.odt", "formattingOut.odt",
+         system.file("examples", "formatting.odt", package = "odfWeave"),
+         fixed = TRUE))
+
+}
+
+
+
 }
 \keyword{utilities}

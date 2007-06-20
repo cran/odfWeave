@@ -7,27 +7,28 @@ export(
    listString,
    matrixPaste,
    odfCat,
+   odfFigureCaption,
    odfInsertPlot,  
    odfItemize, 
+   odfPageBreak,
+   odfSetPageStyle,
    odfTable, 
    odfTable.character, 
    odfTable.data.frame, 
    odfTable.matrix,    
    odfTable.numeric,
+   odfTableCaption,
    odfTmpDir,
    odfTranslate, 
    odfWeave, 
    odfWeaveControl,
    pkgVersions,
-   processInLine,
    RweaveOdf,
    RweaveOdfSetup,
    setImageDefs,       
    setStyles,
    setStyleDefs,   
-   stripXmlTag,
-   tableStyles,   
-   xml2R)
+   tableStyles)
 
 
 S3method(odfTable, character)
@@ -39,4 +40,5 @@ S3method(odfTable, data.frame)
 S3method(print, odfTable)
 S3method(print, odfCat)
 S3method(print, odfItemize)
+S3method(print, odfPageBreak)
 

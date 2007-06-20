@@ -3,7 +3,9 @@ getStyles <- function() get("odfStyles", envir = .odfEnv)
 setStyles <- function(style)
 {
    styleNames <- names(style)
-   required <- c("paragraph", "input", "output", "table", "cell", "header", "cellText", "headerText")
+   required <- c(
+      "paragraph", "input", "output", "table", "cell", 
+      "header", "cellText", "headerText", "page", "figureFrame")
    hasTypes <- required %in% styleNames
    
    if(any(!hasTypes))
@@ -29,7 +31,7 @@ getStyleDefs <- function() get("styleDefs", envir = .odfEnv)
 setStyleDefs <- function(def)
 {
    styleTypes <- unique(unlist(lapply(def, function(x) x$type)))
-   required <- c("Paragraph", "Table Cell", "Table", "Bullet List")
+   required <- c("Paragraph", "Table Cell", "Table", "Bullet List", "Page", "Figure Frame")
    hasTypes <- required %in% styleTypes
    if(any(!hasTypes)) 
       stop(
@@ -48,7 +50,7 @@ function (def, verbose = TRUE)
 {
     if (!(all(names(def) %in% c("type", "device", "plotHeight", 
         "plotWidth", "dispHeight", "dispWidth", "args")))) 
-        stop("arguments were included. see ?setImageDefs")
+        stop("invalid arguments were included. see ?setImageDefs")
     if (!is.null(def$args)) {
         if (!is.list(def$args)) 
             stop("args must be a list")
@@ -71,31 +73,17 @@ function (def, verbose = TRUE)
         if (length(psArgs) == 0 | any(!psArgs)) 
             cat(psNote)
     }
-    current <- getImageDefs()
-    for (i in names(current)) 
-    {
-      if(i != "args")
-      {    
-         current[[i]] <- def[[i]]
-      } else {
-         argNames <- c(names(def[[i]]), names(current[[i]]))
-         for(j in argNames)
-         {
-            if (!is.null(def[[i]][[j]]) && current[[i]][[j]] != def[[i]][[j]]) current[[i]][[j]] <- def[[i]][[j]]
-         }      
-      }
-  
-    }
-    if (current$device %in% c("png", "bmp", "jpeg") & verbose) {
-        if (current$plotHeight <= 30 | current$plotWidth <= 30) 
-            cat(paste("an image size of", current$plotHeight, 
-                "pixels by", current$plotWidth, "pixels has been requested.\n"))
+    
+    if (def$device %in% c("png", "bmp", "jpeg") & verbose) {
+        if (def$plotHeight <= 30 | def$plotWidth <= 30) 
+            cat(paste("an image size of", def$plotHeight, 
+                "pixels by", def$plotWidth, "pixels has been requested.\n"))
     }
     else {
-        if (current$plotHeight >= 30 | current$plotWidth >= 30) 
-            cat(paste("an image size of", current$plotHeight, 
-                "inches by", current$plotWidth, "inches has been requested.\n"))
+        if (def$plotHeight >= 30 | def$plotWidth >= 30) 
+            cat(paste("an image size of", def$plotHeight, 
+                "inches by", def$plotWidth, "inches has been requested.\n"))
     }
     flush.console()
-    assign("imageDefs", current, env = .odfEnv)
+    assign("imageDefs", def, env = .odfEnv)
 }

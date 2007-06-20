@@ -1,5 +1,5 @@
 "listString" <-
-function(x, period = FALSE, verbose = TRUE)
+function(x, period = FALSE, verbose = FALSE)
 {
    if(verbose) cat("\n      entering listString\n")
    flush.console()

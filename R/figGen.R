@@ -2,6 +2,8 @@ figGen <- function(plotName = NULL)
 {
 
    deviceArgs <- getImageDefs()
+   # remove the non-device arguments
+   deviceArgs <-  deviceArgs[!(names(deviceArgs) %in% "anchorType")]
 
    # make up a random name with prefix "rPlot"
    if(is.null(plotName)) plotName <- paste("rPlot", floor(runif(1) * 10000), 

@@ -149,11 +149,11 @@ RweaveOdfRuncode <- function(object, chunk, options, control)
          deviceInfo <- getImageDefs()
          
          imageName <- paste(
-            get("picPath", envir = .odfEnv), 
-            "/", 
-            chunkprefix, 
-            ".", 
-            deviceInfo$type, 
+            get("picPath", envir = .odfEnv),
+            "/",
+            chunkprefix,
+            ".",
+            deviceInfo$type,
             sep = "")
 
          figGen(plotName = imageName)    
@@ -169,7 +169,10 @@ RweaveOdfRuncode <- function(object, chunk, options, control)
             imageName, 
             name = gsub("-", "", chunkprefix),            
             height = deviceInfo$dispHeight, 
-            width = deviceInfo$dispWidth) 
+            width = deviceInfo$dispWidth,
+            caption = .odfEnv$fig.caption)
+         # we need to reset the captions after use            
+         .odfEnv$fig.caption <- NULL            
          cat(plotMarkup, file=chunkout, append=TRUE)
    
     }

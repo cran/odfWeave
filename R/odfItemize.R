@@ -1,34 +1,34 @@
 "odfItemize" <-
-function(data)
+function(data, ...)
 {
    if(!is.vector(data)) stop("data must be a vector")
    styles <- getStyles()
    has <- function(x) !is.null(x) && x != ""
 
-   if(has(styles$bullet)) listStyle <- paste(" text:style-name=\"", styles$bullet, "\" ", sep = "")
-      else listStyle <- ""
-   if(has(styles$paragraph)) textStyle <- paste(" text:style-name=\"", styles$paragraph, "\" ", sep = "")
-      else textStyle <- ""
-
-   x <- paste(
-      "    <text:list-item>\n",
-      "      <text:p ",
-      textStyle,
+   if(!has(styles$bullet)) stop("no bullet style")
+   
+   itemStart <- paste(
+      '     <text:p',
+      tagattr("text:style-name", paste(styles$bullet, "Paragraph", sep="")),
       ">",
-      data,
-      "</text:p>\n",
-      "    </text:list-item>\n",
-      sep = "")
+      sep = " ")
 
+   listStart <- paste(
+      '     <text:list',
+      tagattr("text:style-name", styles$bullet),
+      ">",
+      sep = " ")      
+   
+   bulletItems <- paste('    <text:list-item>\n', itemStart, format(data, ...), "</text:p>\n", '    </text:list-item>\n')
+   
    out <- paste(
-      "\n  <text:list ",
-      listStyle,
-      ">\n",
-      paste(x, collapse = ""),
-      "  </text:list>\n",
-      sep = "")
+      listStart,
+      "\n",
+      paste(bulletItems, collapse = " "),
+      '   </text:list>\n',
+      collapse = "\n")
+   
    structure(out, class = "odfItemize")
 }
 
 print.odfItemize <- function(x, ...) cat(x)
-

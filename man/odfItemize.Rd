@@ -5,10 +5,11 @@
 Creates ODF markup for enumerated or bulleted list one layer deep
 }
 \usage{
-odfItemize(data)
+odfItemize(data, ...)
 }
 \arguments{
   \item{data}{a vector}
+  \item{...}{options to pass to \code{format}}  
 }
 
 \value{

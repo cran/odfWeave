@@ -5,7 +5,7 @@
 Takes a vector and produces output like "element1 and element2" or "element1, element2 and element3"
 }
 \usage{
-listString(x, period = FALSE, verbose = TRUE)
+listString(x, period = FALSE, verbose = FALSE)
 }
 \arguments{
   \item{x}{a vector (converted to character if not)}

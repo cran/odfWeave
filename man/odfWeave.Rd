@@ -10,7 +10,10 @@ odfWeave(file, dest, workDir = odfTmpDir(), control = odfWeaveControl())
 \arguments{
   \item{file}{the ODF file created using OpenOffice V2.0 or above.}
   \item{dest}{path to put the processed file (should include file name and extension)}  
-  \item{workDir}{a path to a directory where the source file will be unpacked and processed.  If it does not exist, it will be created.  If it exists, it should be empty, since all its contents will be included in the generated file.}
+  \item{workDir}{a path to a directory where the source file will be
+    unpacked and processed. If it does not exist, it will be created.
+    If it exists, it should be empty, since all its contents will be
+    included in the generated file.}
   \item{control}{a list of control settings.  See
     \code{\link{odfWeaveControl}}
     for the names of the settable control values and their effects.}
@@ -39,7 +42,7 @@ application is needed. \code{unzip} and \code{zip} are free utilities located at
 
 \url{http://www.info-zip.org/}
 
-Also, \code{jar} can be used. See \code{link{odfWeaveControl}} for more
+Also, \code{jar} can be used. See \code{\link{odfWeaveControl}} for more
 information on configuring \code{odfWeave} to use applications other than
 \code{zip} and \code{unzip}. 
 
@@ -59,8 +62,14 @@ e.g., changing the color of part of the \code{Sexpr} could result in an error. B
 
 The image format and sizes are specified using \code{\link{setImageDefs}}.
 The dimensions of the image file and the dimensions of the rendered
-image can be set independently. See \code{\link{setImageDefs}} for more details.
+image can be set independently. See \code{\link{setImageDefs}} for more
+details.
+
+The document formatting.odt in the package's examples directory
+illustrates the process of changing the appearance of the various
+document elements..
 }
+
 \value{
 an ODF file with the R output
 }
@@ -84,12 +93,19 @@ library(odfWeave)
 odfWeave(demoFile, outputFile)
 
 \dontshow{
+
+   origialStyles <- getStyles()
+   origialDefs <- getStyleDefs()
+
    odfWeave(
       system.file("examples", "examples.odt", package = "odfWeave"),
       gsub(
          "examples.odt", "examplesOut.odt",
          system.file("examples", "examples.odt", package = "odfWeave"),
          fixed = TRUE))
+
+   setStyleDefs(origialDefs)
+   setStyles(origialStyles)
 
    odfWeave(
       system.file("examples", "testCases.odt", package = "odfWeave"),
@@ -98,12 +114,9 @@ odfWeave(demoFile, outputFile)
          system.file("examples", "examples.odt", package = "odfWeave"),
          fixed = TRUE))
 
-   require(stats)
-   attach(environmental)
-   data(state)
-   
-   options(width = 90)
-   
+   setStyleDefs(origialDefs)
+   setStyles(origialStyles)
+
    basicStyles <- getStyleDefs()
    
    basicStyles$lowerBorder$backgroundColor <-  "#FFFFFF"
@@ -122,13 +135,34 @@ odfWeave(demoFile, outputFile)
    basicStyles$highlight$backgroundColor <- "#D4EBF3"
    
    basicStyles$RTable2 <- basicStyles$RTable1
-   basicStyles$RTable2$marginLeft <- "1.5in"
-   basicStyles$RTable2$marginRight <- "1.5in"
-   basicStyles$RTable2$marginTop <- "1in"
+   basicStyles$RTable2$marginLeft <- "1.00in"
+   basicStyles$RTable2$marginRight <- "1.00in"
+   basicStyles$RTable2$marginTop <- "0.05in"
    basicStyles$RTable2$marginBottom <- "2in"
    
-   basicStyles$ttRed$fontSize <- "9pt"
-   basicStyles$ttBlue$fontSize <- "9pt"
+   basicStyles$frameWithBorders <- basicStyles$basicFigFrame
+   basicStyles$frameWithBorders$bottomBorder <- "0.01in solid #000000"
+   basicStyles$frameWithBorders$topBorder <- "0.01in solid #000000"
+   basicStyles$frameWithBorders$leftBorder <- "0.01in solid #000000"
+   basicStyles$frameWithBorders$rightBorder <- "0.01in solid #000000"
+   
+   basicStyles$paddingEx <- basicStyles$frameWithBorders
+   basicStyles$paddingEx$padding <- "0.5in"
+   
+   basicStyles$anchor2 <- basicStyles$basicFigFrame
+   basicStyles$anchor2$imageAnchor <- "as-char"
+   
+   basicStyles$anchor1 <- basicStyles$basicFigFrame
+   basicStyles$anchor1$frameAnchor <- "as-char"
+   
+   basicStyles$wrapping <- basicStyles$basicFigFrame
+   basicStyles$wrapping$wrap <- "right"
+   
+   basicStyles$wideBullet <- basicStyles$Rbullet
+   basicStyles$wideBullet$spaceBefore <- "0.1in"
+   basicStyles$wideBullet$minLabelWidth <- "0.5in"
+   basicStyles$wideBullet$paraStyle <- "ttBlue"
+   basicStyles$wideBullet$bulletChar="\342\234\224"
    
    setStyleDefs(basicStyles)
    
@@ -136,7 +170,8 @@ odfWeave(demoFile, outputFile)
    plotInfo$dispHeight <- 4  
    plotInfo$dispWidth <- 4 
    setImageDefs(plotInfo)
-
+   
+   options(width = 80)
    odfWeave(
       system.file("examples", "formatting.odt", package = "odfWeave"),
       gsub(

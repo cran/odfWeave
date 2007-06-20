@@ -19,6 +19,9 @@ The arguments of \code{tableStyles} must be consistent with those specified for 
 
 Once the appropriate set of style names are generated, the user can programatically alter it. For example, based on some logic, cells can have different text colors etc.
 
+The document formatting.odt in the package's examples directory
+illustrates the process of changing the appearance of the table using \code{tableStyles}.
+
 }
 \value{
 a list of style names with elements:  \code{table},  \code{text},  \code{cell},  \code{header} and  \code{headerCell}. The  \code{text} and  \code{cell} entries are for the non-header table elements.

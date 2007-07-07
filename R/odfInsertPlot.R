@@ -112,9 +112,9 @@ function(file, height, width,
 
    if(is.null(caption))
    {
-      out <- noCaptionXML(name, height, width, units, file, anchor)
+      out <- noCaptionXML(name, width, height, units, file, anchor)
    } else {
-      out <- withCaptionXML(name, height, width, units, file, anchor, caption)
+      out <- withCaptionXML(name, width, height, units, file, anchor, caption)
    }
 
    if(externalFile)

@@ -59,6 +59,7 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    
    announce(verbose, "  Setting wd to ", workDir, "\n")
    setwd(workDir)
+   on.exit(setwd(currentLoc))
 
    # unzip the copied ODT file into tmp dir
    announce(verbose, "  Unzipping ODF file using", zipCmd[2], "\n")

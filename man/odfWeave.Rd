@@ -46,6 +46,16 @@ Also, \code{jar} can be used. See \code{\link{odfWeaveControl}} for more
 information on configuring \code{odfWeave} to use applications other than
 \code{zip} and \code{unzip}. 
 
+A few notes about file paths and working directories:
+\itemize{
+\item When specifying the location of the odt file, you cannot use relative paths such as \code{file = "../file.odt"}. If the input or output files are not in the current working directory, then the absolute path should be used
+
+\item \code{odfWeave} changes the working directory to the location where the odt file is decompressed. If an error occurs within \code{odfWeave}, the working directory will be changed back to the original path
+
+\item Since \code{odfWeave} changes the working directory when the code chunks are executed, references to files and directories should use absolute paths. For example, if you are using \code{read.csv} to bring data into R, the file specification should include the whole path since the working directory will have been changed to a temporary location
+}
+ 
+
 The functionality of \code{\link[utils]{Sweave}} is mostly preserved in
 \code{odfWeave}, such as weaving, hooks, figure environments, etc. Some
 functionality, such as writing output to separate files for each code
@@ -67,7 +77,7 @@ details.
 
 The document formatting.odt in the package's examples directory
 illustrates the process of changing the appearance of the various
-document elements..
+document elements.
 }
 
 \value{

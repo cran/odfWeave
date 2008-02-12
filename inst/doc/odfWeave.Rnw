@@ -307,7 +307,7 @@ The function \texttt{listString} takes a vector and returns a textual list. For 
 
 \section{Converting ODF to Other Formats}
 
-Using OpenOffice, ODF files can be manually converted to other formats using the  "Save As" or "Export" items in the File menu. To convert documents using a command line interface, there are at last two options:
+Using OpenOffice, ODF files can be manually converted to other formats using the  "Save As" or "Export" items in the File menu. To convert documents using a command line interface, there are at least two options:
 \begin{itemize}
 \item on platforms with the Bash shell, Nathan Coulter has written a script that uses the Python internals that are installed with OpenOffice, called ooconvert. This can be found at \linebreak \href{http://sourceforge.net/projects/ooconvert} {http://sourceforge.net/projects/ooconvert}.
 \item there is a Java class, called  JOOConverter, that is available at \href{http://jooreports.sourceforge.net/} {http://jooreports.sourceforge.net/} that can also convert documents.

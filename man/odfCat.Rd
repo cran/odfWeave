@@ -40,7 +40,7 @@ illustrates the process of changing the appearance of the paragraph.
 }
 \value{
 a character strng of class \code{odfCat}}
-}
+
 \author{Max Kuhn}
 
 \seealso{\code{\link{cat}}, \code{\link{format}} }

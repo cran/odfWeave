@@ -7,7 +7,7 @@ adjustImageSize <- function(x, y, scale = 1, res = 96)
 
    temp <- getImageDefs()   
       
-   if(temp$device %in% c("bmp", "jpeg", "png"))
+   if(temp$device %in% c("bmp", "jpeg", "png", "CairoPNG", "CairoJPEG", "CairoTIFF"))
    {
       temp$plotHeight <- res * y * scale
       temp$plotWidth <- res * x * scale

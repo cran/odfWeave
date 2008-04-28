@@ -8,7 +8,9 @@ function(type = "string", ncol = 4)
    pkgs <- lapply(pkgs, packageDescription, fields = c("Package", "Version"))
    pkgs <- lapply(pkgs, unlist)
    pkgDF <- data.frame(do.call("rbind", pkgs))
-   pkgString <- sort(paste(pkgDF[,1], " (v.", pkgDF[,2], ")", sep = ""))
+   pkgString <- paste(pkgDF[,1], " (", pkgDF[,2], ")", sep = "")
+   pkgString <- pkgString[order(tolower(pkgString))]
+   
    out <- switch(type,
       "data frame" = pkgDF,
       string = listString(pkgString, verbose = FALSE),

@@ -3,7 +3,7 @@
 \title{cat and flush console}
 \description{
 This function is a wrapper for \code{cat} with an immediate flush of the console}
-}
+
 \usage{
 announce(verbose = TRUE, ...)
 }

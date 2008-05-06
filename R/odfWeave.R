@@ -14,8 +14,8 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    zipCmd <- gsub("$$file$$", shellQuote(basename(file)), zipCmd, fixed=TRUE)
    
    currentLocale <- c(Sys.getlocale("LC_CTYPE"), Sys.getlocale("LC_COLLATE"))
-   Sys.setlocale("LC_CTYPE", "C")
-   Sys.setlocale("LC_COLLATE", "C")
+   #Sys.setlocale("LC_CTYPE", "C")
+   #Sys.setlocale("LC_COLLATE", "C")
 
    if(dirname(dest) == ".") dest <- paste(currentLoc, "/", dest, sep = "")
    
@@ -86,7 +86,7 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
       "picPath",
       paste(workDir, "/Pictures", sep = ""),
       env = .odfEnv)
-
+ 
    announce(verbose, "\n  Pre-processing the contents\n")
    # pre-process content.xml in preparation for sweaving
    rnwFileName <- "content.Rnw"
@@ -95,8 +95,8 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    # Sweave results to new xml file
    announce(verbose, "  Sweaving ", rnwFileName, "\n\n")
 
-   Sys.setlocale("LC_CTYPE", currentLocale[1])
-   Sys.setlocale("LC_COLLATE", currentLocale[2])
+   #Sys.setlocale("LC_CTYPE", currentLocale[1])
+   #Sys.setlocale("LC_COLLATE", currentLocale[2])
 
    Sweave(file=rnwFileName, output="content_1.xml",
       quiet=!control$verbose, driver=RweaveOdf(), control=control)
@@ -105,8 +105,8 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    
    .odfEnv$fig.caption <- NULL
 
-   Sys.setlocale("LC_CTYPE", "C")
-   Sys.setlocale("LC_COLLATE", "C")
+   #Sys.setlocale("LC_CTYPE", "C")
+   #Sys.setlocale("LC_COLLATE", "C")
 
    # remove the original content.xml
    announce(verbose, "\n  Removing content.xml\n")
@@ -137,8 +137,8 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
 
    announce(verbose, "  Removing extra files\n")
 
-   try(file.remove("content_1.xml"), silent = TRUE)
-   try(file.remove("styles_2.xml"), silent = TRUE)
+   if(file.exists("content_1.xml")) try(file.remove("content_1.xml"), silent = TRUE)
+   if(file.exists("styles_2.xml"))  try(file.remove("styles_2.xml"), silent = TRUE)
 
    # zip up the new ODT file
    announce(verbose, "\n\  Packaging file using", zipCmd[1], "\n")
@@ -157,8 +157,8 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    announce(verbose, "  Resetting wd\n")
    setwd(currentLoc)
 
-   Sys.setlocale("LC_CTYPE", currentLocale[1])
-   Sys.setlocale("LC_COLLATE", currentLocale[2])
+   #Sys.setlocale("LC_CTYPE", currentLocale[1])
+   #Sys.setlocale("LC_COLLATE", currentLocale[2])
 
    assign(
       "picPath",

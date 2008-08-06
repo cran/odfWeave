@@ -17,3 +17,21 @@ odfFigureCaption <- function(caption, numformat='1', numlettersync=FALSE,
                                refname=refname)
    invisible(NULL)
 }
+
+
+xRef <- function(name, type = "number", initial = NULL)
+  {
+
+    ## todo: check type values
+    out <- paste(
+                 "<text:sequence-ref text:reference-format=\"",
+                 type,
+                 "\" text:ref-name=\"",
+                 name,
+                 "\">",
+                 initial,
+                 "</text:sequence-ref>",
+                 sep = "")
+    out
+
+  }

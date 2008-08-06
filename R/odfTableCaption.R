@@ -32,3 +32,6 @@ odfTableCaption <- function(caption, numformat='1', numlettersync=FALSE, formula
    cat('\n')  # see if this removes the warning messages
    invisible(NULL)
 }
+
+getRefs <- function() .odfEnv$seqInfo
+

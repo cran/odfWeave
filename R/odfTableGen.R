@@ -17,8 +17,9 @@ function(x, dataType, header = NULL, tableName, styles)
    textName <- matrixPaste(textNameStart, styles$text, textNameEnd, sep = c("", ""))
    textStart <- makeMatrix("      <text:p", dim(styles$text))
    textEnd <- makeMatrix(">", dim(styles$text))
-   tagEnd <- makeMatrix(" </text:p>\n", dim(styles$text))
-   textMatrix <- matrixPaste(textStart, textName, textEnd, x, tagEnd)
+   tagEnd <- makeMatrix("</text:p>\n", dim(styles$text))
+   textMatrix <- matrixPaste(textStart, textName, textEnd, x, tagEnd,
+                             sep = rep("", 5))
 
    # cell properties
    cellNameStart <- makeMatrix(" table:style-name=\"", dim(styles$cell))

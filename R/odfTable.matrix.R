@@ -10,7 +10,15 @@ function(
 {
    if(!is.null(colnames)) colnames <- odfTranslate(colnames, toR = FALSE)
    colTypes <- apply(x, 2, odfDataType)
-   xChar <- format(x, digits = digits, ...)
+
+   theDots <- list(...)
+   if(!any(names(theDots) == "justify")) theDots$justify <- "none"
+   if(!any(names(theDots) == "trim")) theDots$trim <- TRUE
+   
+   args <- list(x = x, digits = digits)
+   args <- c(args, theDots)
+   xChar <- as.matrix(do.call("format", args))
+  
    if(useRowNames & !is.null(rownames(x)))
    {
       xChar <- cbind(rownames(x), xChar)

@@ -45,7 +45,7 @@ odfTable(x, ...)
 }
 
 \details{
-The data structures are converted to character matrices using \code{format}.
+The data structures are converted to character matrices using \code{format}. The \code{justify} and \code{trim} arguments to \code{format} are usually overridden by the table style options, so those arguments are automatically set to \code{justify = "none"} and \code{trim = TRUE}. However, if values of these arguments are passed using the three dots, format will use them (but they probably won't do anything).
 
 When using \code{odfTable} in a code chunk, the chunk's \code{results}
 argument should be set to \code{xml}.

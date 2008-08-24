@@ -57,7 +57,7 @@ function(x, dataType, header = NULL, tableName, styles)
       textHeaderStyle <- paste(" text:style-name=\"", styles$header, "\" ", sep = "")
       textHeaderStyle <- ifelse(styles$header == "", "", textHeaderStyle)
 
-      headLine01 <- paste("\n      <text:p ", textHeaderStyle, "> ", header, " </text:p>", sep = "")
+      headLine01 <- paste("\n      <text:p ", textHeaderStyle, ">", header, "</text:p>", sep = "")
       headLine02 <- paste(
          "\n    <table:table-cell ",
          cellHeaderStyle,

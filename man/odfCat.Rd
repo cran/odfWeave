@@ -6,8 +6,8 @@ Outputs the objects, concatenating the representations, and sandwiches the outpu
 }
 \usage{
 odfCat(..., sep = " ", trim = FALSE, 
-   digits = max(3, getOption("digits") - 3), nsmall = 0,
-   width = NULL, na.encode = TRUE, scientific = NA)
+       digits = max(3, getOption("digits") - 3), nsmall = 0,
+       width = NULL, na.encode = TRUE, scientific = NA)
 }
 \arguments{
   \item{...}{R objects (see Details for the types of objects allowed).}
@@ -32,8 +32,7 @@ sequentially produce sentences within a paragraph.
 \code{\link{cat}} uses an internal function, so there will be some differences between \code{\link{cat}} and \code{odfCat}. For example, factors are naively converted to character and numeric data are converted to character.
 
 Since the text is embedded in ODF tags escaped characters
-(e.g. \code{\\n}) don't have any effect. Exceptions are \code{\\"} and
-  \code{\\'}.
+(e.g. \code{\\n}) don't have any effect. Exceptions are single- and double-quotes.
 
 The paragraph uses the current paragraph style. The document formatting.odt in the package's examples directory
 illustrates the process of changing the appearance of the paragraph.

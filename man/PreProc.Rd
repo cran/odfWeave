@@ -20,12 +20,12 @@ odfTranslate(x, toR = TRUE)
 \value{
 a character vector
 }
-\author{Max Kuhn and Nathan Coulter }
+\author{Max Kuhn and Nathan Coulter}
 
 \examples{
 
-y <- "\\Sexpr{paste(letters[1:5], <text:s text:c=\"2\"/>collapse = &quot;,&quot;)}"
+y <- "This is an &quot;interesting&quot; function."
 
-odfTranslate(y)
+cat(odfTranslate(y))
 }
 \keyword{utilities}

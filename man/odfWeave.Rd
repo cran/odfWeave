@@ -22,7 +22,7 @@ odfWeave(file, dest, workDir = odfTmpDir(), control = odfWeaveControl())
 \code{odfWeave} can be used to embed R code within a word processing
 document. The \code{odfWeave} package was created so that the
 functionality
-of \code{\link[utils]{Sweave}} can be used within a rich editor like
+of \code{\link[utils:Sweave]{Sweave}} can be used within a rich editor like
 OpenOffice.  The generated document can also easily be edited.
 
 The markup language used is the Open Document Format (ODF), which is an
@@ -56,7 +56,7 @@ A few notes about file paths and working directories:
 }
  
 
-The functionality of \code{\link[utils]{Sweave}} is mostly preserved in
+The functionality of \code{\link[utils:Sweave]{Sweave}} is mostly preserved in
 \code{odfWeave}, such as weaving, hooks, figure environments, etc. Some
 functionality, such as writing output to separate files for each code
 chunk using the \code{split} argument, doesn't make sense when using
@@ -64,7 +64,7 @@ ODF. See \code{\link{RweaveOdf}} for more details about the available
 options.
 
 \code{odfWeave} uses the noweb convention for R code. In-line R commands
-should be in \code{\Sexpr} calls.  the \code{Sexpr} text should all be
+should be in \code{Sexpr} calls.  The \code{Sexpr} text should all be
 completely in one visual format.
 e.g., changing the color of part of the \code{Sexpr} could result in an error. Block code chunks should use the
 \code{<<>>=} syntax (i.e. no Latex syntax will currently work).
@@ -85,7 +85,7 @@ an ODF file with the R output
 }
 \author{Max Kuhn}
 
-\seealso{ \code{\link{odfWeaveControl}},  \code{\link{RweaveOdf}}, \code{\link[utils]{Sweave}}}
+\seealso{ \code{\link{odfWeaveControl}},  \code{\link{RweaveOdf}}, \code{\link[utils:Sweave]{Sweave}}}
 \examples{
 
 \dontrun{vignette("odfWeave")}

@@ -3,7 +3,7 @@
 \alias{RweaveOdfSetup}
 \title{R/ODF Driver for Sweave}
 \description{
-  A driver for \code{\link[utils]{Sweave}} that translates R code chunks in XML files
+  A driver for \code{\link[utils:Sweave]{Sweave}} that translates R code chunks in XML files
   produced in Open Document Format (ODF) files.
 }
 \usage{
@@ -15,7 +15,7 @@ RweaveOdfSetup(file, syntax,
 }
 \arguments{
   \item{file}{Name of Sweave source file.}
-  \item{syntax}{An object of class  \code{\link[utils]{SweaveSyntax}}.}
+  \item{syntax}{An object of class  \code{\link[utils:Sweave]{SweaveSyntax}}.}
   \item{output}{Name of output file, default is to remove extension
     \file{.nw}, \file{.Rnw} or \file{.Snw} and to add extension
     \file{.xml}. Any 
@@ -61,5 +61,5 @@ RweaveOdfSetup(file, syntax,
 }
 \author{Max Kuhn, based on \code{\link{RweaveLatex}} by Friedrich Leisch}
 
-\seealso{\code{\link[utils]{Sweave}}, \code{\link{odfWeave}}, \code{\link{setImageDefs}}}
+\seealso{\code{\link[utils:Sweave]{Sweave}}, \code{\link{odfWeave}}, \code{\link{setImageDefs}}}
 \keyword{utilities}

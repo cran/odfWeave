@@ -11,4 +11,3 @@ print.odfTable <- function(x, ...)
    if(any(dim(x$cells) == 1)) cat(x$cells) else cat(t(x$cells))
    cat(x$end)
 }
-

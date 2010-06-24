@@ -1,4 +1,13 @@
 #################################################################################
+#
+# Note:
+#
+#   This file is currently unused.  The functions in newStyleGen.R are
+#   being used instead.  This will be replaced by newStyleGen.R eventually.
+#
+#################################################################################
+
+#################################################################################
 # This file contains functions to write out style infomration into either
 # content.xml or styles.xml. At the time of creation of these functions, there
 # was no good resource to tell which styles wen into which file (besides trial 

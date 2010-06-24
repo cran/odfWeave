@@ -77,7 +77,7 @@ withCaptionXML <- function(name, width, height, units, file, anchor, caption)
    {
       plotList <- c(plotList, '<text:p text:style-name="Standard"/>')
       plotList <- c(plotList, '</draw:frame>')
-      plotList <- c(plotList, 'Illustration ')
+      plotList <- c(plotList, paste(caption$label, ' '))
       plotList <- c(plotList, '<text:sequence ')
       plotList <- c(plotList, sprintf(' style:num-format="%s"', caption$numformat))
       plotList <- c(plotList, sprintf(' text:formula="ooow:%s"', caption$formula))

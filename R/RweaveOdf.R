@@ -144,7 +144,7 @@ RweaveOdfRuncode <- function(object, chunk, options, control)
         }
     }
 
-    if(options$fig && options$eval)
+    if(options$fig && options$eval && ! isTRUE(.odfEnv$fig.cancel))
     {
          deviceInfo <- getImageDefs()
          
@@ -171,11 +171,13 @@ RweaveOdfRuncode <- function(object, chunk, options, control)
             height = deviceInfo$dispHeight, 
             width = deviceInfo$dispWidth,
             caption = .odfEnv$fig.caption)
-         # we need to reset the captions after use            
-         .odfEnv$fig.caption <- NULL            
          cat(plotMarkup, file=chunkout, append=TRUE)
-   
     }
+
+    # set fig.caption and fig.cancel to NULL, even if "fig" was false
+    .odfEnv$fig.caption <- NULL            
+    .odfEnv$fig.cancel <- NULL            
+
     return(object)
 }
 

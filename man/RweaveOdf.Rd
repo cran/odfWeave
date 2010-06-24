@@ -9,9 +9,14 @@
 \usage{
 RweaveOdf()
 
-RweaveOdfSetup(file, syntax,
-             output=NULL, quiet=FALSE, debug=FALSE, echo=TRUE,
-             eval=TRUE, ...)
+RweaveOdfSetup(file, 
+               syntax,
+               output = NULL, 
+               quiet = FALSE, 
+               debug = FALSE, 
+               echo = TRUE,
+               eval = TRUE, 
+               ...)
 }
 \arguments{
   \item{file}{Name of Sweave source file.}

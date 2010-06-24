@@ -13,39 +13,87 @@ Create an Open Document Format table from a data frame, matrix or vector
 \usage{
 odfTable(x, ...)
 
-\method{odfTable}{numeric}(x, horizontal = length(x) < 5, colnames = names(x), 
-   digits = max(3, getOption("digits") - 3), 
-   name = paste("Table", floor(runif(1) * 1000), sep = ""), 
-   styles = NULL, ...)
+\method{odfTable}{numeric}(x, 
+         horizontal = length(x) < 5, 
+         colnames = names(x), 
+         digits = max(3, getOption("digits") - 3), 
+         name = paste("Table", floor(runif(1) * 1000), sep = ""), 
+         styles = NULL,
+         ...)
   
-\method{odfTable}{character}(x, horizontal = length(x) < 5, colnames = names(x), 
-   name = paste("Table", floor(runif(1) * 1000), sep = ""), 
-   styles = NULL, ...)
+\method{odfTable}{character}(x, 
+         horizontal = length(x) < 5, 
+         colnames = names(x), 
+         name = paste("Table", floor(runif(1) * 1000), sep = ""), 
+         styles = NULL, 
+         ...)
+     
+\method{odfTable}{data.frame}(x, 
+         colnames = NULL, 
+         useRowNames = TRUE, 
+         digits = max(3, getOption("digits") - 3), 
+         name = paste("Table", floor(runif(1) * 1000), sep = ""), 
+         styles = NULL, 
+         cgroup = NULL, 
+         rgroup = NULL, 
+         ...)
    
-  
-\method{odfTable}{data.frame}(x, colnames = NULL, useRowNames = TRUE, 
-   digits = max(3, getOption("digits") - 3), 
-   name = paste("Table", floor(runif(1) * 1000), sep = ""), 
-   styles = NULL, ...)
-   
-\method{odfTable}{matrix}(x, colnames = NULL, useRowNames = TRUE, 
-   digits = max(3, getOption("digits") - 3),
-    name = paste("Table", floor(runif(1) * 1000), sep = ""), 
-    styles = NULL, ...)
+\method{odfTable}{matrix}(x, 
+         colnames = NULL, 
+         useRowNames = TRUE, 
+         digits = max(3, getOption("digits") - 3),
+         name = paste("Table", floor(runif(1) * 1000), sep = ""), 
+         styles = NULL, 
+         cgroup = NULL, 
+         rgroup = NULL, 
+         ...)
 }
 \arguments{
-  \item{x}{a vector, matrix or data frame}
-  \item{horizontal}{a logical: should the vector be shown as a 1xn table or nx1? This is ignored for other data structures.}  
-  \item{colnames}{a vector of column names that can be used. Note that if the row names are used in the table, this should contain an extra element for that column.}
-  \item{useRowNames}{a logical: should the row names be printed in the final table}
-  \item{digits}{number of significant digits passed to \code{format}}
-  \item{name}{A name for the table. ODF requires a name for each object, so a random name will be used if unspecified.}
-  \item{styles}{An optional list of style names for each table element (cells, headers etc). See \code{\link{tableStyles}}}
-  \item{\dots}{optional arguments that can be passed to \code{format}}
+  \item{x}{A vector, matrix or data frame.}
+  \item{horizontal}{A logical: should the vector be shown as a 1xn
+    table or nx1?
+    This is ignored for other data structures.}  
+  \item{colnames}{A vector of column names that can be used.
+    Note that if the row names are used in the table, this should
+    contain an extra element for that column.}
+  \item{useRowNames}{A logical: should the row names be printed in the
+    final table.}
+  \item{digits}{Number of significant digits passed to \code{format}.}
+  \item{name}{A name for the table. ODF requires a name for each object,
+    so a random name will be used if unspecified.}
+  \item{styles}{An optional list of style names for each table element
+    (cells, headers etc). See \code{\link{tableStyles}}}
+  \item{cgroup}{A data frame with two, three, or four columns.
+    The first column should be a character vector specifying column group header names.
+    The resulting row will come before the header names specified via the
+    \code{colnames} argument.
+    The second column should be a numeric vector specifying the column span for the
+    corresponding element of the first column.
+    The sum of the second column must be equal to the number of columns in \code{x},
+    plus one, if \code{useRowNames} is true and \code{x} actually has row names.
+    If there is a third column, it should contain the names of paragraph styles to use.
+    If there is a fourth column, it should contain the names of cell styles.
+    In the absence of these columns, the \code{cgroupText} and \code{cgroupCell}
+    elements of the \code{styles} argument will be used.}
+  \item{rgroup}{A data frame with two, three, or four columns.
+    The first column should be a character vector specifying row group header names.
+    The second column should be a numeric vector specifying the row span for the
+    corresponding element of the first column.
+    The sum of the second column must be equal to the number of rows in \code{x}.
+    If there is a third column, it should contain the names of paragraph styles to use.
+    If there is a fourth column, it should contain the names of cell styles.
+    In the absence of these columns, the \code{rgroupText} and \code{rgroupCell}
+    elements of the \code{styles} argument will be used.}
+  \item{\dots}{Optional arguments that can be passed to \code{format}.}
 }
 
 \details{
-The data structures are converted to character matrices using \code{format}. The \code{justify} and \code{trim} arguments to \code{format} are usually overridden by the table style options, so those arguments are automatically set to \code{justify = "none"} and \code{trim = TRUE}. However, if values of these arguments are passed using the three dots, format will use them (but they probably won't do anything).
+The data structures are converted to character matrices using \code{format}.
+The \code{justify} and \code{trim} arguments to \code{format} are usually
+overridden by the table style options, so those arguments are automatically set
+to \code{justify = "none"} and \code{trim = TRUE}. However, if values of these
+arguments are passed using the three dots, format will use them (but they
+probably won't do anything).
 
 When using \code{odfTable} in a code chunk, the chunk's \code{results}
 argument should be set to \code{xml}.
@@ -56,11 +104,28 @@ illustrates the process of changing the appearance of the table.
 \value{
 a list of character string that contain XML markup
 }
-\author{Max Kuhn}
+\author{Max Kuhn, with contributions from Zekai Otles}
 
 \seealso{\code{\link{tableStyles}}}
 \examples{
 odfTable(iris[1:5,])
+
+# Simple use of cgroup
+data(odfWeaveData)
+str(carRentInfo)
+
+cgroup <- data.frame(label = c("row","C"),
+                     span = c(1, 3))
+odfTable(mdat, cgroup = cgroup)
+
+# Use of cgroup and rgroup
+carCgroup <- data.frame(label = c("", "Compact", "Medium", "Full", "SUV"),
+                        span = c(1, 2, 2, 2, 2))
+carRgroup <- data.frame(label = c("Jan.-Feb.", "Mar.-Apr"),
+                        span = c(5, 5))
+
+odfTable(carRentInfo$tableCells, 
+         cgroup = carCgroup, 
+         rgroup = carRgroup)
 }
 \keyword{utilities}
-

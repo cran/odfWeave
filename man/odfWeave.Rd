@@ -172,7 +172,9 @@ odfWeave(demoFile, outputFile)
    basicStyles$wideBullet$spaceBefore <- "0.1in"
    basicStyles$wideBullet$minLabelWidth <- "0.5in"
    basicStyles$wideBullet$paraStyle <- "ttBlue"
-   basicStyles$wideBullet$bulletChar="\342\234\224"
+   bullet <- "\342\227\217"
+   Encoding(bullet) <- "UTF-8"
+   basicStyles$wideBullet$bulletChar <- bullet
    
    setStyleDefs(basicStyles)
    

@@ -6,14 +6,16 @@
 Allows the user to specify how odfWeave operates and style information for the document.
 }
 \usage{
-odfWeaveControl(
-    zipCmd = c("zip -r $$file$$ .", "unzip -o $$file$$"), 
-    cleanup = TRUE, verbose = TRUE)}
+odfWeaveControl(zipCmd = c("zip -r $$file$$ .", "unzip -o $$file$$"), 
+                cleanup = !debug, 
+                verbose = TRUE, 
+                debug = FALSE)}
 \arguments{
   \item{zipCmd}{a string for the zipping/unzipping the \code{odt} file
     via a system call. The token \code{$$file$$} will be gsub'ed with the file name.}
   \item{cleanup}{a logical: remove the working directory?}
   \item{verbose}{a logical: should details be printed?}
+  \item{debug}{a logical: should intermediate files be kept to aid debugging?}
 }
 
 \value{

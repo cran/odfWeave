@@ -33,7 +33,8 @@ decToRoman <- function(num, s, decs, romans)
 
 convert <- function(val, tail, alpha)
 {
-   if (val <= 0) {
+   if (val <= 0)
+   {
       tail
    } else {
       x <- val %/% length(alpha)
@@ -68,364 +69,263 @@ formatText <- function(val, fmt, numsync)
 
 strToBool <- function(s) s == 'true' | s == 't'
 
-uniqueName <- function(nvec, prefix)
+# This function performs the first pass of the post processing phase
+# in the odfWeave package.  Most of the work is done here.
+posttraverse <- function(node, seqenv)
 {
-   i <- 1
-   repeat {
-      n <- paste(prefix, i, sep='')
-      if (!any(n == nvec)) break
-      i <- i + 1
-   }
-   n
-}
-
-# event handler functions
-
-content2StartElement <- function(name, atts, .state)
-{
-   if (!is.null(.state$buffer))
-      openTag(.state$buffer[[1]], .state$buffer[[2]], .state$outfile)
-
-   if (name == 'style:font-face')
+   # Called for each 'text:sequence-decl' to initialize the sequence variable in seqenv
+   sequence_decl <- function(node)
    {
-      # keep track of all of the fonts that are defined
-      .state$fontsDefined <- c(.state$fontsDefined, atts['style:name'])
-   } else if (name == 'text:sequence') {
-      seqName <- atts['text:name']
-      formula <- atts['text:formula']
-      formula <- sub('^[a-z]+: *', '', formula)
-      # XXX should handle errors better
-      val <- eval(parse(text=formula), .state$seqEnv)
-      .state$seqEnv[[seqName]] <- val
-      fmt <- atts['style:num-format']
-      numsync <- atts['style:num-letter-sync']
-      numsync <- if (is.na(numsync)) FALSE else strToBool(numsync)
-      .state$seqValue <- formatText(val, fmt, numsync)
+      # This function is just called for this side-effect
+      assign(xmlGetAttr(node, 'text:name', 'ERROR'), 0, pos=seqenv)
+
+      # Return the unmodified node
+      node
    }
 
-   # check if this is a "break element"
-   if (any(.state$n == .state$breakNumbers))
+   # Called for each 'text:sequence' to recompute its value
+   sequence <- function(node)
    {
-      # need to change the value of the style-name attribute
-      n <- .state$breakElements[[as.character(.state$n)]]$newStyle
-      if (name == 'text:p')
+      # Only process this 'text:sequence' node if the attribute
+      # 'text:display-outline-level' is not defined or equal to zero
+      level <- xmlGetAttr(node, 'text:display-outline-level')
+      if (is.null(level) || as.integer(level) == 0)
       {
-         atts[['text:style-name']] <- n
-      } else if (name == 'table:table') {
-         atts[['table:style-name']] <- n
-      } else {
-         stop('internal error: unhandled break element: ', name)
-      }
-   }
+         # Create a text node to use as the sole child of this 'text:sequence' element
+         formula <- xmlGetAttr(node, 'text:formula', '999999')
+         formula <- sub('^[a-z]+: *', '', formula)
 
-   .state$buffer <- list(name, atts)
-   .state$n <- .state$n + 1
-   .state
-}
-
-content2Text <- function(x, .state)
-{
-   if (!is.null(.state$buffer))
-      openTag(.state$buffer[[1]], .state$buffer[[2]], .state$outfile)
-
-   # do not write the text value of a text:sequence element
-   if (is.null(.state$seqValue))
-      processText(x, .state$outfile)
-   .state$buffer <- NULL
-   .state
-}
-
-getChild <- function(node, attr, value)
-{
-   for (child in node$children)
-   {
-      if (!is.null(child$attributes[attr]) && child$attributes[attr] == value)
-         return(child)
-   }
-   NULL
-}
-
-handleBreakElements <- function(.state)
-{
-   for (i in seq(along = .state$breakElements))
-   {
-      pageStyle <- .state$breakElements[[i]]$style
-
-      if (.state$breakElements[[i]]$name == 'text:p')
-      {
-         n <- uniqueName(.state$allocatedNames, 'P')
-         .state$allocatedNames <- c(.state$allocatedNames, n)
-         .state$breakElements[[i]]$newStyle <- n
-         styleName <- .state$breakElements[[i]]$atts[['text:style-name']]
-
-         ia <- which(styleName == .state$autoStyleNames)
-         if (length(ia) > 0)
+         tryCatch(
          {
-            # we cannot subclass an automatic style, so we have to
-            # define a new automatic style that is the same as the
-            # original, but with the page break
-            xnode <- getChild(.state$autoStyles, 'style:name', styleName)
-         } else {
-            xnode <- xmlNode('style:style', attrs=c('style:parent-style-name'=styleName))
-         }
+            val <- eval(parse(text=formula), seqenv)
+            seqName <- xmlGetAttr(node, 'text:name', 'ERROR')
+            assign(seqName, val, pos=seqenv)
+            fmt <- xmlGetAttr(node, 'style:num-format', '1')
+            numsync <- xmlGetAttr(node, 'style:num-letter-sync', 'FALSE')
+            numsync <- if (is.na(numsync)) FALSE else strToBool(numsync)
+            fmtval <- formatText(val, fmt, numsync)
+            newnode <- xmlTextNode(fmtval)
+            xmlChildren(node) <- list(newnode)
 
-         xnode$attributes['style:name'] <- n
-         xnode$attributes['style:family'] <- 'paragraph'
-
-         if (!is.null(pageStyle))
+            # If this 'text:sequence' element has a reference name (it should)
+            # then assign the formatted value of this sequence to "seqenv" using
+            # that name.  That information will be needed in the subsequent
+            # recomputation of the 'text:sequence-ref' elements.
+            refname <- xmlGetAttr(node, 'text:ref-name')
+            if (! is.null(refname))
+            {
+               assign(refname, fmtval, pos=seqenv)
+            }
+         },
+         error=function(e)
          {
-            xnode$attributes['style:master-page-name'] <- pageStyle
-         } else if (!is.null(xnode$children[['style:paragraph-properties']])) {
-            xnode$children[['style:paragraph-properties']]$attributes['fo:break-before'] <- 'page'
-         } else {
-            xnode$children[[xmlSize(xnode) + 1]] <-
-               xmlNode('style:paragraph-properties',
-                       attrs=c('fo:break-before'='page'))
-         }
+            warning(sprintf('Caught error: %s', conditionMessage(e)))
+         })
+      } else {
+         warning("not processing sequence with display-outline-level ", level)
+      }
 
-         saveXML(xnode, file=.state$outfile, prefix=NULL)
-      } else if (.state$breakElements[[i]]$name == 'table:table') {
-         n <- .state$breakElements[[i]]$atts[['table:name']]
-         if (any(n == .state$allocatedNames))
-            n <- uniqueName(.state$allocatedNames, 'TTable')
-         .state$allocatedNames <- c(.state$allocatedNames, n)
-         .state$breakElements[[i]]$newStyle <- n
-         styleName <- .state$breakElements[[i]]$atts[['table:style-name']]
+      # Return the modified node
+      node
+   }
 
-         ia <- which(styleName == .state$autoStyleNames)
-         if (length(ia) > 0)
+   # Called for the 'office:automatic-styles' to add our "content" sytles
+   automatic_styles <- function(node)
+   {
+      # Get the "content" styles
+      newstyles <- newStyleGen(getStyleDefs(), type='content')
+
+      # Any styles that were dynamically generated during the Sweave phase
+      dynstyles <- eapply(.odfEnv$newStyleEnv, function(style) style)
+
+      # Append them to the list of other automatic styles
+      xmlChildren(node) <- c(xmlChildren(node), newstyles, dynstyles)
+
+      # Return the modified node
+      node
+   }
+
+   # Called for each 'style:font-face' to record the name of all fonts
+   # that are defined in this document
+   font_face <- function(node)
+   {
+      # This function is just called for this side-effect
+      font <- xmlGetAttr(node, 'style:name')
+      fontsdefined <<- c(fontsdefined, font)  # Defined in enclosing environment!
+
+      # Return the unmodified node
+      node
+   }
+
+   # Called for the 'office:font-face-decls' to add any fonts that we
+   # need but aren't already defined in the document
+   font_face_decls <- function(node, fonts)
+   {
+      # Create new 'style:font-face' elements
+      fun <- function(fontname)
+      {
+         xmlNode('style:font-face',
+                 attrs=c('style:name'=fontname, 'svg:font-family'=fontname))
+      }
+      newFonts <- lapply(fonts, fun)
+
+      # Append the new 'style:font-face' element to the node's list of children
+      xmlChildren(node) <- c(xmlChildren(node), newFonts)
+
+      # Return the modified node
+      node
+   }
+
+   # This is the traversal function that controls all of the work
+   traverse.recurse <- function(node)
+   {
+      nodeName <- xmlName(node, full=TRUE)
+      # cat('traverse.recurse called on node:', nodeName, '\n', file=stderr())
+
+      newChildren <- vector('list', length=xmlSize(node))
+
+      for (i in seq(length=xmlSize(node)))
+      {
+         child <- xmlChildren(node)[[i]]
+         childName <- xmlName(child, full=TRUE)
+         # cat(sprintf('processing child %d: %s\n', i, childName), file=stderr())
+
+         newChild <- if (inherits(child, 'XMLTextNode'))
          {
-            # we cannot subclass an automatic style, so we have to
-            # define a new automatic style that is the same as the
-            # original, but with the page break
-            xnode <- getChild(.state$autoStyles, 'style:name', styleName)
+            # Don't traverse text nodes
+            child
+         } else if (childName == 'office:automatic-styles') {
+            # Add all extra styles that we need
+            automatic_styles(child)
+         } else if (childName == 'text:sequence-decl') {
+            # Initialize a corresponding sequence variable
+            sequence_decl(child)
+         } else if (childName == 'text:sequence') {
+            # Recompute the value of all sequences in the document
+            sequence(child)
+         } else if (childName == 'style:font-face') {
+            # Records the name of this font in "fontsdefined" variable
+            font_face(child)
          } else {
-            xnode <- xmlNode('style:style', attrs=c('style:parent-style-name'=styleName))
+            # Nothing special to do, so we just traverse it
+            traverse.recurse(child)
          }
+         # cat('assigning new child with class', class(newChild)[1], '\n', file=stderr())
+         newChildren[[i]] <- newChild
+      }
 
-         xnode$attributes['style:name'] <- n
-         xnode$attributes['style:family'] <- 'table'
+      # cat('assigning new children\n', file=stderr())
+      xmlChildren(node) <- newChildren
 
-         if (!is.null(pageStyle))
+      # Do any work on this node that needs to be done after all
+      # of the children have been processed.
+      if (nodeName == 'office:font-face-decls')
+      {
+         # Add fonts that we need but weren't found in the document
+         # now that we've processed all of the children of this node
+         fontstoadd <- setdiff(fontsneeded, fontsdefined)
+         node <- font_face_decls(node, fontstoadd)
+      }
+
+      node
+   }
+
+   # Initialize and then call the actual traversal routine
+   fontsneeded <- unique(unlist(lapply(getStyleDefs(), function(font) font$fontName)))
+   fontsdefined <- character()  # This is filled in as we traverse the document
+   traverse.recurse(node)
+}
+
+# This function performs the second pass of the post processing phase
+# in the odfWeave package.  It only recomputes the value of 'text:sequence-ref'
+# nodes.  This couldn't be done in the first pass, because we could have
+# a forward reference to a sequence that hasn't been recomputed yet.
+# By putting these off to a second pass, we know the value of all of the
+# sequences, and can therefore easily recompute all of the references.
+posttraverse_2 <- function(node, seqenv)
+{
+   sequence_ref <- function(node)
+   {
+      # cat(sprintf('sequence_ref called on element %s\n', xmlName(node, full=TRUE)), file=stderr())
+      refname <- xmlGetAttr(node, 'text:ref-name')
+      refformat <- xmlGetAttr(node, 'text:reference-format')
+      if (refformat == 'value')
+      {
+         tryCatch(
          {
-            xnode$attributes['style:master-page-name'] <- pageStyle
-         } else if (!is.null(xnode$children[['style:table-properties']])) {
-            xnode$children[['style:table-properties']]$attributes['fo:break-before'] <- 'page'
+            value <- get(refname, pos=seqenv)
+            # cat(sprintf('formatted value of sequence %s is %s\n', refname, value), file=stderr())
+            newnode <- xmlTextNode(value)
+            xmlChildren(node) <- list(newnode)
+         },
+         error=function(e)
+         {
+            warning(sprintf("found reference to unknown sequence: %s", refname))
+         })
+      } else {
+         warning("not processing sequence reference with type ", refformat)
+      }
+
+      # Return the modified node
+      node
+   }
+
+   # This is the traversal function that controls all of the work
+   traverse_2.recurse <- function(node)
+   {
+      nodeName <- xmlName(node, full=TRUE)
+      # cat('traverse_2.recurse called on node:', nodeName, '\n', file=stderr())
+
+      newChildren <- vector('list', length=xmlSize(node))
+
+      for (i in seq(length=xmlSize(node)))
+      {
+         child <- xmlChildren(node)[[i]]
+         childName <- xmlName(child, full=TRUE)
+         # cat(sprintf('processing child %d: %s\n', i, childName), file=stderr())
+
+         newChild <- if (inherits(child, 'XMLTextNode'))
+         {
+            # Don't traverse text nodes
+            child
+         } else if (childName == 'text:sequence-ref') {
+            # Recompute the value of this sequence reference
+            sequence_ref(child)
          } else {
-            xnode$children[[xmlSize(xnode) + 1]] <-
-               xmlNode('style:table-properties',
-                       attrs=c('fo:break-before'='page'))
+            # Nothing special to do, so we just traverse it
+            traverse_2.recurse(child)
          }
-
-         saveXML(xnode, file=.state$outfile, prefix=NULL)
-      } else {
-         # complain very bitterly
-         stop('internal error: automatic-styles: ',
-               .state$breakElements[[i]]$name)
-      }
-   }
-   .state
-}
-
-content2EndElement <- function(name, .state)
-{
-   if (name == 'office:automatic-styles')
-   {
-      # add the automatic styles that we need
-      if (!is.null(.state$buffer))
-      {
-         openTag(.state$buffer[[1]], .state$buffer[[2]], .state$outfile)
-         .state$buffer <- NULL
+         # cat('assigning new child with class', class(newChild)[1], '\n', file=stderr())
+         newChildren[[i]] <- newChild
       }
 
-      # now we add the styles needed for implementing page breaks
-      .state <- handleBreakElements(.state)
+      # cat('assigning new children\n', file=stderr())
+      xmlChildren(node) <- newChildren
 
-      cat(odfStyleGen(getStyleDefs(), 'content'),
-         file=.state$outfile)
-
-      closeTag(name, .state$outfile)
-   } else if (name == 'office:font-face-decls') {
-      # define all fonts that are needed but not already defined
-      if (!is.null(.state$buffer))
-      {
-         openTag(.state$buffer[[1]], .state$buffer[[2]], .state$outfile)
-         .state$buffer <- NULL
-      }
-      fonts <- setdiff(.state$fontsNeeded, .state$fontsDefined)
-      cat(paste(unlist(lapply(fonts,
-         function(font) {
-            completeTag('style:font-face',
-               c('style:name'=font, 'svg:font-family'=font),
-              .state$outfile)
-         })), collapse=''), file=.state$outfile)
-      closeTag(name, .state$outfile)
-   } else if (name == 'text:sequence') {
-      # first write the correctly formatted sequence value,
-      # and then the closing tag
-      stopifnot(!is.null(.state$seqValue))
-      if (!is.null(.state$buffer))
-      {
-         openTag(.state$buffer[[1]], .state$buffer[[2]], .state$outfile)
-         .state$buffer <- NULL
-      }
-      processText(.state$seqValue, .state$outfile)
-      closeTag(name, .state$outfile)
-      .state$seqValue <- NULL
-   } else if (name == 'odfWeave:pageBreak') {
-      # this is how we delete the phony <odfWeave:pageBreak/> element
-      stopifnot(!is.null(.state$buffer))
-      .state$buffer <- NULL
-   } else {
-      # now handle the closing tag
-      if (!is.null(.state$buffer))
-      {
-         completeTag(.state$buffer[[1]], .state$buffer[[2]], .state$outfile)
-         .state$buffer <- NULL
-      } else {
-         closeTag(name, .state$outfile)
-      }
-   }
-   .state
-}
-
-# The following handlers are used to collect information about the content
-# after being run through Sweave, in preparation for the final XML
-# transformations.  We learned about the original input XML in the first
-# pass, but the Sweave pass changed it, so now we have got to scan it again
-# before we will be ready to do the final transformations.
-#
-# To support page breaks, we will look for a <odfWeave:pageBreak/> element.
-# When we find one, we look for the next paragraph of table element.  We
-# need to remember it, so we can changes its style on the next pass.
-#
-# During the next pass we have to:
-#  - remove all odfWeave:pageBreak elements
-#  - 
-
-infoStartElement <- function(name, atts, .state)
-{
-   if (name == 'odfWeave:pageBreak')
-   {
-      .state$looking <- TRUE
-      if (!is.null(atts) && !is.na(atts['style']))
-         .state$breakStyle <- atts['style']
-   } else if (.state$looking && any(name == c('text:p', 'table:table'))) {
-      .state$breakElements[[as.character(.state$n)]] <-
-            list(n=.state$n, name=name, atts=atts, style=.state$breakStyle)
-      .state$looking <- FALSE
-      .state$breakStyle <- NULL
-   } else if (name == 'office:automatic-styles' || .state$autoLevel > 0) {
-      if (.state$autoLevel == 0)
-         .state$autoLevel <- 1
-
-      xnode <- xmlNode(name, attrs=atts)
-      m <- length(.state$node)
-      if (.state$autoLevel > m)
-      {
-         m <- m + 1
-         stopifnot(.state$autoLevel == m)
-         .state$node[[m]] <- list(xnode)
-      } else {
-         stopifnot(.state$autoLevel == m)
-         n <- length(.state$node[[m]]) + 1
-         .state$node[[m]][[n]] <- xnode
-      }
-      .state$autoLevel <- .state$autoLevel + 1
+      node
    }
 
-   .state$n <- .state$n + 1
-   .state
-}
-
-infoText <- function(x, .state)
-{
-   if (.state$autoLevel > 0)
-   {
-      xnode <- xmlTextNode(x)
-      m <- length(.state$node)
-      if (.state$autoLevel > m)
-      {
-         m <- m + 1
-         stopifnot(.state$level == m)
-         .state$node[[m]] <- list(xnode)
-      } else {
-         stopifnot(.state$autoLevel == m)
-         n <- length(.state$node[[m]]) + 1
-         .state$node[[m]][[n]] <- xnode
-      }
-   }
-
-   .state
-}
-
-infoEndElement <- function(name, .state)
-{
-   if (.state$autoLevel > 0)
-   {
-      .state$autoLevel <- .state$autoLevel - 1
-      m <- length(.state$node)
-      if (m > .state$autoLevel)
-      {
-         n <- length(.state$node[[.state$autoLevel]])
-         .state$node[[.state$autoLevel]][[n]]$children <- .state$node[[m]]
-         .state$node[[m]] <- NULL
-      }
-
-      if (name == 'office:automatic-styles')
-      {
-         stopifnot(.state$autoLevel == 1)
-         .state$autoLevel <- 0
-      }
-   }
-
-   .state
+   # Simply call the traversal routine
+   traverse_2.recurse(node)
 }
 
 # this is the main function that turns the output from Sweave
 # into the content.xml file of the ODF file
-
-postproc <- function(infile, outfile)
+postproc <- function(node, outfile)
 {
-   outcon <- file(outfile, open='w')
+   # Create an environment that will pass information from one pass to the next
+   env <- new.env(parent=baseenv())
 
-   state <- list(n=0,
-                 autoLevel=0,
-                 node=list(),
-                 looking=FALSE,
-                 breakElements=list())
-   handlers <- list(startElement=infoStartElement,
-                    endElement=infoEndElement,
-                    text=infoText)
-   state <- xmlEventParse(infile, handlers=handlers, trim=FALSE, state=state)
+   # Most of the work is done here, but we will have to do another pass
+   # which needs information from the environment to perform
+   newNode <- posttraverse(node, env)
 
-   fontsNeeded <- unique(unlist(lapply(getStyleDefs(),
-         function(font) font$fontName)))
-   fontsDefined <- character()
+   # Need to fix the 'text:sequence-ref' elements after the first pass
+   # since we must guarantee that all of the sequences have been recomputed
+   newNode <- posttraverse_2(newNode, env)
 
-   # initialize all declared sequences to zero
-   seqEnv <- new.env()
-   for (seq in names(.odfEnv$seqInfo))
-      seqEnv[[seq]] <- 0
+   # Write out the post processed XML file
+   writeXML(newNode, file=outfile)
 
-   autoStyles <- state$node[[1]][[1]]
-   autoStyleNames <- unlist(lapply(autoStyles$children, function(x) x$attributes[['style:name']]))
-
-   state <- list(buffer=NULL, outfile=outcon, seqEnv=seqEnv, seqValue=NULL,
-                 fontsDefined=fontsDefined, fontsNeeded=fontsNeeded,
-                 autoStyles=autoStyles,
-                 autoStyleNames=autoStyleNames,
-                 allocatedNames=autoStyleNames,
-                 breakElements=state$breakElements,
-                 breakNumbers=as.integer(names(state$breakElements)),
-                 n=0)
-   handlers <- list(startElement=content2StartElement,
-                    endElement=content2EndElement,
-                    text=content2Text,
-                    startDocument=startDocument,
-                    endDocument=endDocument)
-   state <- xmlEventParse(infile, handlers=handlers, trim=FALSE, state=state)
-
-   close(outcon)
-   invisible(state)  # not sure whether I should encourage this
+   invisible(NULL)
 }

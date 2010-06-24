@@ -1,72 +1,100 @@
-# event handler functions
-
-stylesStartElement <- function(name, atts, .state)
+# This function traverses and transforms the styles.xml file
+# in an ODF document.
+stylestraverse <- function(node)
 {
-   if (!is.null(.state$buffer))
-      openTag(.state$buffer[[1]], .state$buffer[[2]], .state$outfile)
-   .state$buffer <- list(name, atts)
-   .state
-}
-
-stylesText <- function(x, .state)
-{
-   if (!is.null(.state$buffer))
-      openTag(.state$buffer[[1]], .state$buffer[[2]], .state$outfile)
-   processText(x, .state$outfile)
-   .state$buffer <- NULL
-   .state
-}
-
-stylesEndElement <- function(name, .state)
-{
-
-   if (name == 'office:styles')
+   # Called for the 'office:styles' to add our "styles" sytles
+   office_styles <- function(node)
    {
-      # add the styles that we need
-      if (!is.null(.state$buffer))
-         openTag(.state$buffer[[1]], .state$buffer[[2]], .state$outfile)
-      cat(odfStyleGen(getStyleDefs(), 'styles'),
-         file=.state$outfile)
-      closeTag(name, .state$outfile)
-   } else if (name == 'office:automatic-styles') {
-      if (!is.null(.state$buffer))
-         openTag(.state$buffer[[1]], .state$buffer[[2]], .state$outfile)
-      cat(odfStyleGen(getStyleDefs(), 'page'),
-         file=.state$outfile)
-      closeTag(name, .state$outfile)
-   } else if (name == 'office:master-styles') {
-      if (!is.null(.state$buffer))
-         openTag(.state$buffer[[1]], .state$buffer[[2]], .state$outfile)
-      # add a style:master-page element for each style:page-layout element
-      # that we added to the automatic styles
-      cat(odfStyleGen(getStyleDefs(), 'master'),
-         file=.state$outfile)
-      closeTag(name, .state$outfile)
-   } else {
-      if (!is.null(.state$buffer))
-         completeTag(.state$buffer[[1]], .state$buffer[[2]], .state$outfile)
-      else
-         closeTag(name, .state$outfile)
+      # Get the "styles" styles
+      newstyles <- newStyleGen(getStyleDefs(), type='styles')
+
+      # Append them to the list of other styles
+      xmlChildren(node) <- c(xmlChildren(node), newstyles)
+
+      # Return the modified node
+      node
    }
-   .state$buffer <- NULL
-   .state
+
+   # Called for the 'office:automatic-styles' to add our "page" sytles
+   automatic_styles <- function(node)
+   {
+      # Get the "page" styles
+      newstyles <- newStyleGen(getStyleDefs(), type='page')
+
+      # Append them to the list of other automatic styles
+      xmlChildren(node) <- c(xmlChildren(node), newstyles)
+
+      # Return the modified node
+      node
+   }
+
+   # Called for the 'office:master-styles' to add our "master" sytles
+   master_styles <- function(node)
+   {
+      # Get the "page" styles
+      newstyles <- newStyleGen(getStyleDefs(), type='master')
+
+      # Append them to the list of other master styles
+      xmlChildren(node) <- c(xmlChildren(node), newstyles)
+
+      # Return the modified node
+      node
+   }
+
+   # This is the traversal function that controls all of the work
+   traverse.recurse <- function(node)
+   {
+      nodeName <- xmlName(node, full=TRUE)
+      # cat('traverse.recurse called on node:', nodeName, '\n', file=stderr())
+
+      newChildren <- vector('list', length=xmlSize(node))
+
+      for (i in seq(length=xmlSize(node)))
+      {
+         child <- xmlChildren(node)[[i]]
+         childName <- xmlName(child, full=TRUE)
+         # cat(sprintf('processing child %d: %s\n', i, childName), file=stderr())
+
+         newChild <- if (inherits(child, 'XMLTextNode'))
+         {
+            # Don't traverse text nodes
+            child
+         } else if (childName == 'office:styles') {
+            # Add all extra styles that we need
+            office_styles(child)
+         } else if (childName == 'office:automatic-styles') {
+            # Add all extra styles that we need
+            automatic_styles(child)
+         } else if (childName == 'office:master-styles') {
+            # Add all extra styles that we need
+            master_styles(child)
+         } else {
+            # Nothing special to do, so we just traverse it
+            traverse.recurse(child)
+         }
+         # cat('assigning new child with class', class(newChild)[1], '\n', file=stderr())
+         newChildren[[i]] <- newChild
+      }
+
+      # cat('assigning new children\n', file=stderr())
+      xmlChildren(node) <- newChildren
+
+      node
+   }
+
+   # Call the traversal routine
+   traverse.recurse(node)
 }
 
-# this is the main function that adds styles to the styles.xml file
+# This is the main function that adds styles to the styles.xml file
 # of the output ODF file
-
-procstyles <- function(infile, outfile)
+procstyles <- function(node, outfile)
 {
-   outcon <- file(outfile, open='w')
+   # Add the new styles that we need
+   newNode <- stylestraverse(node)
 
-   state <- list(buffer=NULL, outfile=outcon)
-   handlers <- list(startElement=stylesStartElement,
-                    endElement=stylesEndElement,
-                    text=stylesText,
-                    startDocument=startDocument,
-                    endDocument=endDocument)
-   state <- xmlEventParse(infile, handlers=handlers, trim=FALSE, state=state)
+   # Write out the post processed XML file
+   writeXML(newNode, file=outfile)
 
-   close(outcon)
-   invisible(state)  # not sure whether I should encourage this
+   invisible(NULL)
 }

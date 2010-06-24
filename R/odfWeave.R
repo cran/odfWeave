@@ -87,10 +87,36 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
       paste(workDir, "/Pictures", sep = ""),
       env = .odfEnv)
  
+   # Create the "Style Name Environment" which will be used to create
+   # unique style names during the Sweave phase.  Names of the existing
+   # style definitions will be put into this environment during the
+   # preprocessing stage.
+   # Note that this assignment may overwrite an environment created on
+   # an earlier call to odfWeave.  We need a new, clean one at this point.
+   styleNameEnv <- new.env(hash=TRUE, parent=emptyenv())
+   assign('styleNameEnv', styleNameEnv, pos=.odfEnv)
+
+   # Parse content.xml
+   top <- getTopNode("content.xml")
+
+   # Initialize the "Style Name Environment"
+   initStyleNames(top, styleNameEnv)
+
+   # Initialize seqInfo
+   seqInfo <- getSeqInfo(top)
+   assign('seqInfo', seqInfo, pos=.odfEnv)
+
    announce(verbose, "\n  Pre-processing the contents\n")
    # pre-process content.xml in preparation for sweaving
    rnwFileName <- "content.Rnw"
-   preproc("content.xml", rnwFileName)
+   preproc(top, rnwFileName)
+
+   # Create the "New Style Environment" which will be used to register
+   # styles (in the form of XMLNode objects) that will later be added
+   # to the document during post processing.
+   # Note that this assignment may overwrite an environment created on
+   # an earlier call to odfWeave.  We need a new, clean one at this point.
+   assign('newStyleEnv', new.env(hash=TRUE, parent=emptyenv()), pos=.odfEnv)
 
    # Sweave results to new xml file
    announce(verbose, "  Sweaving ", rnwFileName, "\n\n")
@@ -108,37 +134,61 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    #Sys.setlocale("LC_CTYPE", "C")
    #Sys.setlocale("LC_COLLATE", "C")
 
-   # remove the original content.xml
-   announce(verbose, "\n  Removing content.xml\n")
-   file.remove("content.xml")
-   if (file.exists("content.xml")) stop("Error removing xml file")
+   if (!control$debug)
+   {
+      # remove the original content.xml
+      announce(verbose, "\n  Removing content.xml\n")
+      file.remove("content.xml")
+      if (file.exists("content.xml")) stop("Error removing content.xml file")
+   } else {
+      announce(verbose, "  Renaming original content.xml to content_orig.xml\n")
+      file.rename("content.xml", "content_orig.xml")
+      if (file.exists("content.xml")) stop("Error renaming content.xml file")
+   }
 
    announce(verbose, "\n  Post-processing the contents\n")
    # post-process the output from Sweave
-   postproc("content_1.xml", "content.xml")
+   top <- getTopNode("content_1.xml")
+   postproc(top, "content.xml")
 
-   # remove the input to Sweave
-   announce(verbose, "  Removing", rnwFileName, "\n")
-   file.remove(rnwFileName)
-   if (file.exists(rnwFileName)) stop("Error removing xml file")
+   if (!control$debug)
+   {
+      # remove the input to Sweave
+      announce(verbose, "  Removing", rnwFileName, "\n")
+      file.remove(rnwFileName)
+      if (file.exists(rnwFileName)) stop("Error removing xml file")
+   } else {
+      announce(verbose, "  Not removing", rnwFileName, "\n")
+   }
 
    # process styles.xml
-   procstyles("styles.xml", "styles_2.xml")
+   stylestop <- getTopNode("styles.xml")
+   procstyles(stylestop, "styles_2.xml")
 
-   # remove original styles.xml file
-   announce(verbose, "  Removing styles.xml\n")
-   file.remove("styles.xml")
-   if (file.exists(rnwFileName)) stop("Error removing xml file")
+   if (!control$debug)
+   {
+      # remove original styles.xml file
+      announce(verbose, "  Removing styles.xml\n")
+      file.remove("styles.xml")
+      if (file.exists("styles.xml")) stop("Error removing styles.xml file")
+   } else {
+      announce(verbose, "  Renaming original styles.xml to styles_orig.xml\n")
+      file.rename("styles.xml", "styles_orig.xml")
+      if (file.exists("styles.xml")) stop("Error renaming styles.xml file")
+   }
 
    # rename post-processed file to styles.xml ready for zipping
    announce(verbose, "  Renaming styles_2.xml to styles.xml\n")
    file.rename("styles_2.xml", "styles.xml")
    if (!file.exists("styles.xml")) stop("Error renaming styles xml file")
 
-   announce(verbose, "  Removing extra files\n")
-
-   if(file.exists("content_1.xml")) try(file.remove("content_1.xml"), silent = TRUE)
-   if(file.exists("styles_2.xml"))  try(file.remove("styles_2.xml"), silent = TRUE)
+   if (!control$debug)
+   {
+      announce(verbose, "  Removing extra files\n")
+      if(file.exists("content_1.xml")) try(file.remove("content_1.xml"), silent = TRUE)
+   } else {
+      announce(verbose, "  Not removing extra files\n")
+   }
 
    # zip up the new ODT file
    announce(verbose, "\n\  Packaging file using", zipCmd[1], "\n")

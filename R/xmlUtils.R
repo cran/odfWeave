@@ -33,12 +33,23 @@ escape <- function(x)
    x
 }
 
+# Convert certain UTF-8 encoded characters to their non-word processing
+# equivalents, since R doesn't like them
 correct <- function(x)
 {
-   x <- gsub('\342\200\223', '-', x)
-   x <- gsub('\342\200\235', '"', x)
-   x <- gsub('\342\200\234', '"', x)
-   x
+  longDash <- "\342\200\223"
+  Encoding(longDash) <- "UTF-8"
+  badQuote1 <- "\342\200\235"
+  Encoding(badQuote1) <- "UTF-8"
+  badQuote2 <- "\342\200\234"
+  Encoding(badQuote2) <- "UTF-8"
+  leftArrow <- "\342\206\220"
+  Encoding(leftArrow) <- "UTF-8"  
+  x <- gsub(longDash, '-', x)
+  x <- gsub(badQuote1, '"', x)
+  x <- gsub(badQuote2, '"', x)
+  x <- gsub(leftArrow, '<-', x)
+  x
 }
 
 # convert a hex string to a decimal number
@@ -136,32 +147,4 @@ genXMLAttributes <- function(atts)
       paste(' ', names(atts), '="', processAttributes(atts), '"', sep='', collapse='')
    else
       ''
-}
-
-startTag <- function(name, atts, outfile)
-{
-   cat('<', name, genXMLAttributes(atts), sep='', file=outfile)
-}
-
-openTag <- function(name, atts, outfile)
-{
-   startTag(name, atts, outfile)
-   cat('>', file=outfile)
-}
-
-closeTag <- function(name, outfile)
-{
-   cat(sprintf('</%s>', name), file=outfile)
-}
-
-completeTag <- function(name, atts, outfile)
-{
-   startTag(name, atts, outfile)
-   cat('/>', file=outfile)
-}
-
-processText <- function(t, outfile)
-{
-   if (!is.null(t))
-      cat(escape(t), file=outfile)
 }

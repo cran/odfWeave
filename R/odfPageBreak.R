@@ -1,6 +1,6 @@
 odfPageBreak <- function()
 {
-   x <- list(text='<odfWeave:pageBreak/>')
+   x <- list(text='<text:p text:style-name="OdfPageBreak"/>')
    return(structure(x, class='odfPageBreak'))
 }
 

@@ -5,12 +5,14 @@
 Based on the current style specifications, create style names for all table elements.
 }
 \usage{
-tableStyles(x, useRowNames = TRUE, header = NULL)
+tableStyles(x, useRowNames = TRUE, header = NULL, cgroup = NULL, rgroup = NULL)
 }
 \arguments{
   \item{x}{a vector, matrix or data frame. See details below}
   \item{useRowNames}{a logical: should the row names be printed in the final table}  
   \item{header}{an optional vector of heading names}
+  \item{cgroup}{an optional data frame of group heading names and spans}
+  \item{rgroup}{an optional data frame of group row names and spans}
 }
 \details{
 Based on the dimensions of \code{x}, this function generates table style names for all of the elements. For example, f the data are an nxn matrix, it will create an nxn matrix of style names for the text and the table cells. 
@@ -24,8 +26,10 @@ illustrates the process of changing the appearance of the table using \code{tabl
 
 }
 \value{
-a list of style names with elements:  \code{table},  \code{text},  \code{cell},  \code{header} and  \code{headerCell}. The  \code{text} and  \code{cell} entries are for the non-header table elements.
-
+A list of style names with elements: \code{table}, \code{text}, \code{cell},
+\code{header}, \code{headerCell}, \code{cgroupText}, \code{cgroupCell},
+\code{rgroupText} and \code{rgroupCell}.
+The \code{text} and \code{cell} entries are for the non-header table elements.
 }
 \author{Max Kuhn}
 

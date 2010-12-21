@@ -2,15 +2,25 @@
 function(x, dataType, header = NULL, tableName, styles,
          cgroup = NULL, rgroup = NULL)
 {
+   # Sanity check dataType
+   legaltypes <- c('float', 'percentage', 'currency', 'date', 'time',
+                   'boolean', 'string')
+   if (! all(dataType %in% legaltypes))
+   {
+      stop('illegal value of dataType argument')
+   }
+
    # Sanity check cgroup and rgroup
-   if (!is.null(cgroup)) {
+   if (!is.null(cgroup))
+   {
       if (!is.data.frame(cgroup) || ncol(cgroup) < 2 || ncol(cgroup) > 4)
          stop('cgroup must be a data frame with 2 to 4 columns')
       if (nrow(cgroup) == 0)
          cgroup <- NULL
    }
 
-   if (!is.null(rgroup)) {
+   if (!is.null(rgroup))
+   {
       if (!is.data.frame(rgroup) || ncol(rgroup) < 2 || ncol(rgroup) > 4)
          stop('rgroup must be a data frame with 2 to 4 columns')
       if (nrow(rgroup) == 0)

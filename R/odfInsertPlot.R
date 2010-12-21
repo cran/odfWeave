@@ -40,7 +40,6 @@ withCaptionXML <- function(name, width, height, units, file, anchor, caption)
    } else paddingAmount <- 0
    
    plotList <- list()
-   plotList <- c(plotList, '<text:p text:style-name="Standard"/>')   
    plotList <- c(plotList, anchor[1])
    plotList <- c(plotList, '<draw:frame')
    plotList <- c(plotList, sprintf(' draw:style-name="%s"', styles$figureFrame))
@@ -75,7 +74,6 @@ withCaptionXML <- function(name, width, height, units, file, anchor, caption)
    plotList <- c(plotList, ' xlink:actuate="onLoad"/>')
    if (!is.null(caption))
    {
-      plotList <- c(plotList, '<text:p text:style-name="Standard"/>')
       plotList <- c(plotList, '</draw:frame>')
       plotList <- c(plotList, paste(caption$label, ' '))
       plotList <- c(plotList, '<text:sequence ')
@@ -123,6 +121,9 @@ function(file, height, width,
       if(!file.exists(dest)) stop(paste(dest, "does not exist"))
       if(!file.copy(file, newPath,  overwrite = TRUE)) stop("Error copying file")
    }
+
+   # append the basename of the image file to .odfEnv$picVector
+   .odfEnv$picVector <- c(.odfEnv$picVector, basename(file))
 
    out
 }

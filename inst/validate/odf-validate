@@ -1,0 +1,74 @@
+#!/usr/bin/env python
+
+import sys, os, zipfile
+
+_ELEMENTS = ['content.xml', 'styles.xml']
+_MANIFEST = 'META-INF/manifest.xml'
+
+def check(odtname, schemafile, elementname, xml, verbose=False):
+  odtbase, ext = os.path.splitext(odtname)
+  elementname = elementname.rstrip('/')
+  elementbase, ext = os.path.splitext(elementname)
+
+  bname = odtbase + '-' + elementbase
+  name = bname + '.xml'
+  if os.path.exists(name):
+    sys.stderr.write("file %s already exists: not checking\n" % name)
+    return
+
+  logfile = bname + '.log'
+
+  if os.path.exists(logfile):
+    sys.stderr.write("file %s already exists: not checking\n" % logfile)
+    return
+
+  status = -1
+  open(name, 'w').write(xml)
+  try:
+    cmd = "jing -i %s %s > %s" % (schemafile, name, logfile)
+    if verbose:
+      print "Executing command:", cmd
+    try:
+      os.system(cmd)
+      errors = open(logfile, 'r').read()
+      if errors:
+        sys.stderr.write('warning: jing reported errors for %s of %s: see %s\n' % \
+                         (elementname, odtname, logfile))
+      else:
+        status = 0
+    finally:
+      if status == 0:
+        os.unlink(logfile)
+  finally:
+    if status == 0:
+      os.unlink(name)
+
+if __name__ == "__main__":
+  # assume it's in the current directory
+  schemafile = 'OpenDocument-v1.2-cd05-schema.rng'
+  manifestschemafile = 'OpenDocument-v1.2-cd05-manifest-schema.rng'
+
+  # Loop over all of the specified ODT files
+  for name in sys.argv[1:]:
+    try:
+      if zipfile.is_zipfile(name):
+        # Open the ODT file
+        z = zipfile.ZipFile(name)
+
+        # Check the manifest file
+        t = z.read(_MANIFEST)
+        check(name, manifestschemafile, 'manifest.xml', t)
+
+        # Check the rest of the XML files that we may have modified
+        for element in _ELEMENTS:
+          t = z.read(element)
+          check(name, schemafile, element, t)
+
+        # Close the ODT file
+        z.close()
+      else:
+        sys.stderr.write("not a zip file: %s\n" % name)
+        break
+    except IOError:
+      sys.stderr.write("error opening %s\n" % name)
+      sys.exit(1)

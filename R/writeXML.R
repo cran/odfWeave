@@ -1,11 +1,13 @@
 # This writes an XML file using the specified top level node
-writeXML <- function(node, file=stdout())
+writeXML <- function(node, file)
 {
    if (is.character(file))
    {
-      file <- file(file, open='w')
+      file <- file(file, open='wb')
       on.exit(close(file))
    }
+
+   writeRaw <- function(s, file) writeBin(charToRaw(s), file)
 
    writeXML.recurse <- function(node)
    {
@@ -13,12 +15,12 @@ writeXML <- function(node, file=stdout())
       {
          if (!is.null(node$raw))
          {
-            cat(xmlValue(node), file=file)
+            writeRaw(xmlValue(node), file=file)
          } else {
-            cat(escape(xmlValue(node)), file=file)
+            writeRaw(escape(xmlValue(node)), file=file)
          }
       } else {
-         cat(sprintf('<%s', xmlName(node, full=TRUE)), file=file)
+         writeRaw(sprintf('<%s', xmlName(node, full=TRUE)), file=file)
          atts <- xmlAttrs(node)
 
          # This won't be necessary for "minixml" package
@@ -33,23 +35,23 @@ writeXML <- function(node, file=stdout())
             }
          }
 
-         cat(genXMLAttributes(atts), file=file)
+         writeRaw(genXMLAttributes(atts), file=file)
 
          if (xmlSize(node) == 0)
          {
-            cat('/>', file=file)
+            writeRaw('/>', file=file)
          } else {
-            cat('>', file=file)
+            writeRaw('>', file=file)
             for (child in xmlChildren(node))
             {
                writeXML.recurse(child)
             }
-            cat(sprintf('</%s>', xmlName(node, full=TRUE)), file=file)
+            writeRaw(sprintf('</%s>', xmlName(node, full=TRUE)), file=file)
          }
       }
    }
 
-   cat('<?xml version="1.0" encoding="UTF-8"?>\n', file=file)
+   writeRaw('<?xml version="1.0" encoding="UTF-8"?>\n', file=file)
    writeXML.recurse(node)
-   cat('\n', file=file)
+   writeRaw('\n', file=file)
 }

@@ -86,6 +86,15 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
       "picPath",
       paste(workDir, "/Pictures", sep = ""),
       env = .odfEnv)
+
+   # create a character vector in .odfEnv that will collect the
+   # names of the image files inserted into the document via
+   # odfInsertPlot.  This is needed so that we can add those
+   # files to META-INF/manifest.xml later in this function.
+   assign(
+      "picVector",
+      character(),
+      env = .odfEnv)
  
    # Create the "Style Name Environment" which will be used to create
    # unique style names during the Sweave phase.  Names of the existing
@@ -182,6 +191,34 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    file.rename("styles_2.xml", "styles.xml")
    if (!file.exists("styles.xml")) stop("Error renaming styles xml file")
 
+   # verbose listing of picture files
+   for (picFile in .odfEnv$picVector)
+   {
+      announce(verbose, paste("  Collected picture file ", picFile, "\n", sep=""))
+   }
+
+   # process META-INF/manifest.xml
+   manifesttop <- getTopNode("META-INF/manifest.xml")
+   procmanifest(manifesttop, "META-INF/manifest_2.xml")
+
+   if (!control$debug)
+   {
+      # remove original manifest.xml file
+      announce(verbose, "  Removing manifest.xml\n")
+      file.remove("META-INF/manifest.xml")
+      if (file.exists("META-INF/manifest.xml")) stop("Error removing manifest.xml file")
+   } else {
+      announce(verbose, "  Renaming original manifest.xml to manifest_orig.xml\n")
+      file.rename("META-INF/manifest.xml", "META-INF/manifest_orig.xml")
+      if (file.exists("META-INF/manifest.xml")) stop("Error renaming manifest.xml file")
+   }
+
+   # rename post-processed file to manifest.xml ready for zipping
+   announce(verbose, "  Renaming manifest_2.xml to manifest.xml\n")
+   file.rename("META-INF/manifest_2.xml", "META-INF/manifest.xml")
+   if (!file.exists("META-INF/manifest.xml")) stop("Error renaming manifest xml file")
+
+   # do final cleanup if debugging isn't enabled
    if (!control$debug)
    {
       announce(verbose, "  Removing extra files\n")
@@ -212,6 +249,10 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
 
    assign(
       "picPath",
+      NA,
+      env = .odfEnv)
+   assign(
+      "picVector",
       NA,
       env = .odfEnv)
 

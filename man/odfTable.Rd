@@ -109,23 +109,5 @@ a list of character string that contain XML markup
 \seealso{\code{\link{tableStyles}}}
 \examples{
 odfTable(iris[1:5,])
-
-# Simple use of cgroup
-data(odfWeaveData)
-str(carRentInfo)
-
-cgroup <- data.frame(label = c("row","C"),
-                     span = c(1, 3))
-odfTable(mdat, cgroup = cgroup)
-
-# Use of cgroup and rgroup
-carCgroup <- data.frame(label = c("", "Compact", "Medium", "Full", "SUV"),
-                        span = c(1, 2, 2, 2, 2))
-carRgroup <- data.frame(label = c("Jan.-Feb.", "Mar.-Apr"),
-                        span = c(5, 5))
-
-odfTable(carRentInfo$tableCells, 
-         cgroup = carCgroup, 
-         rgroup = carRgroup)
 }
 \keyword{utilities}

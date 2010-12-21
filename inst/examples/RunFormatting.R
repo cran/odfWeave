@@ -6,7 +6,7 @@ basicStyles$lowerBorderGray <-  basicStyles$lowerBorder
 basicStyles$lowerBorderGray$backgroundColor <-  "#E8E8E8"
 
 basicStyles$ArialCenteredItalics <- basicStyles$ArialCenteredBold
-basicStyles$ArialCenteredItalics$fontSize <- "10 pt"
+basicStyles$ArialCenteredItalics$fontSize <- "10pt"
 basicStyles$ArialCenteredItalics$fontType <- "italic"
 
 basicStyles$ArialHighlight$fontColor <- "#000080"
@@ -43,7 +43,8 @@ basicStyles$wideBullet <- basicStyles$Rbullet
 basicStyles$wideBullet$spaceBefore <- "0.1in"
 basicStyles$wideBullet$minLabelWidth <- "0.5in"
 basicStyles$wideBullet$paraStyle <- "ttBlue"
-basicStyles$wideBullet$bulletChar="\342\234\224"
+basicStyles$wideBullet$bulletChar <- "\342\234\224"
+Encoding(basicStyles$wideBullet$bulletChar) <- "UTF-8"
 
 setStyleDefs(basicStyles)
 

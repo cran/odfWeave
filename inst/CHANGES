@@ -1,4 +1,28 @@
 ----------------------------------
+Version: 0.7.17
+Date: 2010-12-21
+
+Removed data directory.
+
+Fixed several problems on Windows, mostly related to Unicode
+handling.
+
+----------------------------------
+Version: 0.7.16
+Date: 2010-08-09
+
+Added automated validation tests on the odfWeave examples.
+
+Changed the order of the text-properties and 
+paragraph-properties to avoid a validation error.
+
+Fixed list style generation.  This caused incorrect XML, which
+caused the Rbullet style to not work.
+
+Encodings for bullet (and other) characters were added by
+cran request
+
+----------------------------------
 Version: 0.7.13
 Date: 2010-06-23
 

@@ -256,11 +256,11 @@ newStyleGen <- function(x, type="styles")
 
          pattrs <- getParagraphPropertyAttrs(styleName, thisStyle)
          children <- c(
-            list(xmlNode('style:text-properties',
-                         attrs=getTextPropertyAttrs(styleName, thisStyle))),
             if (!is.null(pattrs))
                list(xmlNode('style:paragraph-properties',
-                            attrs=pattrs))
+                            attrs=pattrs)),
+            list(xmlNode('style:text-properties',
+                         attrs=getTextPropertyAttrs(styleName, thisStyle)))
          )
          xmlNode('style:style',
                  attrs=getStyleAttrs(styleName, thisStyle),
@@ -363,13 +363,12 @@ newStyleGen <- function(x, type="styles")
       {
          thisStyle <- x[[idx]]
          styleName <- styleNames[idx]
-         children <- c(
+         children <-
             list(xmlNode('text:list-level-style-bullet',
-                         attrs=getListLevelStyleAttrs(styleName, thisStyle))),
-            list(xmlNode('style:list-level-properties',
-                         attrs=getListLevelPropertiesAttrs(styleName, thisStyle)))
-         )
-         xmlNode('style:style',
+                         attrs=getListLevelStyleAttrs(styleName, thisStyle),
+                         .children=list(xmlNode('style:list-level-properties',
+                                               attrs=getListLevelPropertiesAttrs(styleName, thisStyle)))))
+         xmlNode('text:list-style',
                  attrs=getListStyleAttrs(styleName, thisStyle),
                  .children=children)
       }

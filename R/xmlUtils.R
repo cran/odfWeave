@@ -37,18 +37,34 @@ escape <- function(x)
 # equivalents, since R doesn't like them
 correct <- function(x)
 {
-  longDash <- "\342\200\223"
-  Encoding(longDash) <- "UTF-8"
-  badQuote1 <- "\342\200\235"
-  Encoding(badQuote1) <- "UTF-8"
-  badQuote2 <- "\342\200\234"
-  Encoding(badQuote2) <- "UTF-8"
-  leftArrow <- "\342\206\220"
-  Encoding(leftArrow) <- "UTF-8"  
-  x <- gsub(longDash, '-', x)
-  x <- gsub(badQuote1, '"', x)
-  x <- gsub(badQuote2, '"', x)
-  x <- gsub(leftArrow, '<-', x)
+  # Save the original encoding so we can propagate it to the return value
+  orig <- Encoding(x)
+
+  if (orig %in% c('unknown', 'UTF-8'))
+  {
+    # Define variables that contain the UTF-8 encodings for
+    # various Unicode characters that we wish to translate.
+    # They basically undo "corrections" often made by
+    # Open Office Writer.
+    longDash <- '\342\200\223'
+    badQuote1 <- '\342\200\235'
+    badQuote2 <- '\342\200\234'
+    leftArrow <- '\342\206\220'
+
+    # We set useBytes to TRUE, because we want to treat the
+    # Unicode characters as sequences of bytes
+    x <- gsub(longDash, '-', x, useBytes=TRUE)
+    x <- gsub(badQuote1, '"', x, useBytes=TRUE)
+    x <- gsub(badQuote2, '"', x, useBytes=TRUE)
+    x <- gsub(leftArrow, '<-', x, useBytes=TRUE)
+  } else {
+    # Issue a warning that we got an unexpected encoding, and
+    # do nothing
+    warning('unexpected encoding passed to correct function: ', orig)
+  }
+
+  # Make sure the return value has the original encoding
+  Encoding(x) <- orig
   x
 }
 

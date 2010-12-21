@@ -100,8 +100,7 @@ RweaveOdfRuncode <- function(object, chunk, options, control)
             taggedDce <- paste(codeMarkup$input, dceForXml2, endTag, "\n", sep = "")               
             
             cat("\n", 
-                paste(taggedDce,
-                      collapse=paste("\n", rCont, sep="")),
+                paste(taggedDce, collapse=""),
                 file=chunkout, append=TRUE, sep="")
         }
 

@@ -1,0 +1,35 @@
+This directory contains a shell script and Python script used
+to check that odfWeave produces validate output.  To use this,
+you need to have the "jing" utility in your execution path.
+For more information on "jing", see:
+
+  http://www.thaiopensource.com/relaxng/jing.html
+
+Note that test.sh will copy various files from ../examples, so this
+directory needs to be writable in order to execute test.sh.
+
+This directory contains the following files:
+
+  test.sh
+    The shell script that drives the processing of ODT files,
+    and runs "jing" on the resulting files.
+
+  odf-validate
+    A Python script that runs "jing" on the content.xml, styles.xml,
+    and META-INF/manifest.xml elements in a specified ODT file.
+    Currently, the schema files (listed next) must be in the
+    current working directory.
+
+  OpenDocument-v1.2-cd05-schema.rng
+    The RELAX NG schema file for the content and styles elements of
+    an ODT file (actually, for all XML other than the manifest).
+
+  OpenDocument-v1.2-cd05-manifest-schema.orig
+    The original RELAX NG schema file for the manifest of an ODT file.
+    My copy of Open Office 3.2.1 doesn't seem to create ODT files
+    that validate properly due to a missing "manifest:version"
+    attribute.
+
+  OpenDocument-v1.2-cd05-manifest-schema.rng
+    The modified RELAX NG schema file for the manifest of an ODT file.
+    It makes a "manifest:version" attribute optional.

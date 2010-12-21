@@ -11,9 +11,6 @@ odfSetPageStyle <- function(style="Standard")
                                 family='paragraph', type='common',
                                 prevstyle='Standard')
 
-   cat(sprintf('Generated new style %s in odfSetPageStyle:\n', paragraphStyleName))
-   print(newStyle)
-
    newStyleEnv <- get('newStyleEnv', pos=.odfEnv, inherits=FALSE)
    assign(paragraphStyleName, newStyle, pos=newStyleEnv)
 

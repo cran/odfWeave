@@ -13,11 +13,7 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    zipCmd <- control$zipCmd
    zipCmd <- gsub("$$file$$", shellQuote(basename(file)), zipCmd, fixed=TRUE)
    
-   currentLocale <- c(Sys.getlocale("LC_CTYPE"), Sys.getlocale("LC_COLLATE"))
-   #Sys.setlocale("LC_CTYPE", "C")
-   #Sys.setlocale("LC_COLLATE", "C")
-
-   if(dirname(dest) == ".") dest <- paste(currentLoc, "/", dest, sep = "")
+   dest <- canonicalFilePath(dest)
    
    verbose <- control$verbose
 
@@ -42,13 +38,22 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
       }
    }
 
-   # create temp dir to work in
+   # Create temp dir to work in.  Remember if we created it so
+   # we will know whether to delete it or not.
    if(!file.exists(workDir))
    {
       announce(verbose, "  Creating ", workDir, "\n")
       dir.create(workDir, showWarnings = TRUE, recursive = FALSE)
       if(!file.exists(workDir)) stop("Error creating working directory")
+      created.workDir <- TRUE
+   } else {
+      warning("working in existing directory")
+      created.workDir <- FALSE
    }
+
+   # Make absolute version of workDir so it will be valid after
+   # we cd to it
+   workDir <- canonicalDirPath(workDir)
 
    workingCopy <- basename(file)
    
@@ -75,6 +80,18 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    file.remove(workingCopy)
    if (file.exists(workingCopy)) stop("Error removing original file")
 
+   # Make sure we can convert content.xml to the current locale,
+   # otherwise the output from the 'Sweave' function will be invalid XML.
+   text <- iconv(readLines('content.xml', warn=FALSE), 'UTF-8', '')
+   if (any(is.na(text)))
+   {
+       announce(verbose, "\n  Unable to convert", workingCopy, "to the current locale\n")
+       announce(verbose, "  You may need to process this file in a UTF-8 locale\n")
+       stop(sprintf("unable to convert %s to the current locale",
+                    workingCopy))
+   }
+   rm(text)
+
    # create Pictures directory if it was not created by unzipping the ODT file
    if(!file.exists(paste(workDir, "/Pictures", sep = "")))
    {
@@ -85,7 +102,7 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    assign(
       "picPath",
       paste(workDir, "/Pictures", sep = ""),
-      env = .odfEnv)
+      pos = .odfEnv)
 
    # create a character vector in .odfEnv that will collect the
    # names of the image files inserted into the document via
@@ -94,7 +111,7 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    assign(
       "picVector",
       character(),
-      env = .odfEnv)
+      pos = .odfEnv)
  
    # Create the "Style Name Environment" which will be used to create
    # unique style names during the Sweave phase.  Names of the existing
@@ -106,7 +123,8 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    assign('styleNameEnv', styleNameEnv, pos=.odfEnv)
 
    # Parse content.xml
-   top <- getTopNode("content.xml")
+   content.xml.doc <- parseXML("content.xml")
+   top <- getTopNode(content.xml.doc)
 
    # Initialize the "Style Name Environment"
    initStyleNames(top, styleNameEnv)
@@ -130,18 +148,13 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    # Sweave results to new xml file
    announce(verbose, "  Sweaving ", rnwFileName, "\n\n")
 
-   #Sys.setlocale("LC_CTYPE", currentLocale[1])
-   #Sys.setlocale("LC_COLLATE", currentLocale[2])
-
    Sweave(file=rnwFileName, output="content_1.xml",
-      quiet=!control$verbose, driver=RweaveOdf(), control=control)
+      quiet=!control$verbose, driver=RweaveOdf(), control=control,
+      encoding="UTF-8")
 
    # reset the figure captions
    
    .odfEnv$fig.caption <- NULL
-
-   #Sys.setlocale("LC_CTYPE", "C")
-   #Sys.setlocale("LC_COLLATE", "C")
 
    if (!control$debug)
    {
@@ -157,7 +170,8 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
 
    announce(verbose, "\n  Post-processing the contents\n")
    # post-process the output from Sweave
-   top <- getTopNode("content_1.xml")
+   content_1.xml.doc <- parseXML("content_1.xml")
+   top <- getTopNode(content_1.xml.doc)
    postproc(top, "content.xml")
 
    if (!control$debug)
@@ -171,7 +185,8 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    }
 
    # process styles.xml
-   stylestop <- getTopNode("styles.xml")
+   styles.xml.doc <- parseXML("styles.xml")
+   stylestop <- getTopNode(styles.xml.doc)
    procstyles(stylestop, "styles_2.xml")
 
    if (!control$debug)
@@ -198,7 +213,8 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    }
 
    # process META-INF/manifest.xml
-   manifesttop <- getTopNode("META-INF/manifest.xml")
+   manifest.xml.doc <- parseXML("META-INF/manifest.xml")
+   manifesttop <- getTopNode(manifest.xml.doc)
    procmanifest(manifesttop, "META-INF/manifest_2.xml")
 
    if (!control$debug)
@@ -244,20 +260,17 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    announce(verbose, "  Resetting wd\n")
    setwd(currentLoc)
 
-   #Sys.setlocale("LC_CTYPE", currentLocale[1])
-   #Sys.setlocale("LC_COLLATE", currentLocale[2])
-
    assign(
       "picPath",
       NA,
-      env = .odfEnv)
+      pos = .odfEnv)
    assign(
       "picVector",
       NA,
-      env = .odfEnv)
+      pos = .odfEnv)
 
-   # delete tmp dir that we were working in
-   if(control$cleanup)
+   # Delete tmp dir that we were working in if we created it
+   if(control$cleanup && created.workDir)
    {
       announce(verbose, "  Removing ", workDir, "\n")
       unlink(workDir, recursive=TRUE)
@@ -270,6 +283,30 @@ function(file, dest, workDir=odfTmpDir(), control=odfWeaveControl())
    }
    announce(verbose, "\n  Done\n")   
    invisible(NULL)
+}
+
+# This works like normalizePath except that it handles the case
+# where the path doesn't exist.  The value of dirname(path) must
+# exist, however.
+"canonicalFilePath" <- function(path)
+{
+   d <- dirname(path)
+   if (! file.exists(d))
+      stop('directory does not exist: ', d)
+   if (! file_test("-d", d))
+      stop(d, ' is not a directory')
+   file.path(normalizePath(d), basename(path))
+}
+
+# This is a wrapper for normalizePath, but issues specific
+# errors rather than a warning if the path doesn't exist.
+"canonicalDirPath" <- function(path)
+{
+   if (! file.exists(path))
+      stop('directory does not exist: ', path)
+   if (! file_test("-d", path))
+      stop(path, ' is not a directory')
+   normalizePath(path)
 }
 
 "announce" <- function (verbose = TRUE, ...) 

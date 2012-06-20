@@ -74,7 +74,10 @@ addentries <- function(node)
       }
 
       # Append them to the list of other master styles
-      xmlChildren(node) <- c(xmlChildren(node), newentries)
+
+      # XXX work-around for XML 3.4 bug?
+      # xmlChildren(node) <- c(xmlChildren(node), newentries)
+      node <- makeNode(node, c(xmlChildren(node), newentries))
    }
 
    # Return the (possibly modified) node

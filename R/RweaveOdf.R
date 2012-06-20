@@ -24,7 +24,16 @@ RweaveOdfSetup <-
     }
     if(!quiet) cat("  Writing to file ", output, "\n",
                    "  Processing code chunks ...\n", sep="")
-    output <- file(output, open="w+")
+
+    # Since we always pass encoding="UTF-8" to the Sweave function,
+    # the encoding attribute should be set to "UTF-8" if any non-ASCII
+    # characters were found in the input XML file, or to "ASCII" if not.
+    # I'll issue a warning message if it is something else, and
+    # use "UTF-8" encoding for the output file in any case.
+    encoding <- attr(file, "encoding")
+    if (! encoding %in% c("UTF-8", "ASCII"))
+        warning("unexpected encoding attribute found on file: ", encoding)
+    output <- file(output, open="w+", encoding="UTF-8")
 
     options <- list(prefix=TRUE, prefix.string=prefix.string,
                     engine="R", print=FALSE, eval=eval,

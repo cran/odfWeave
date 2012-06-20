@@ -1,4 +1,31 @@
 ----------------------------------
+Version: 0.8.0
+Date: 2012-6-19
+
+Made various changes suggested by Professor Brian Ripley to
+try to correct encoding problems in non-UTF-8 locales.  This
+includes:
+
+o Removed examples from man pages that don't work in all
+  locales.
+
+o Passed the encoding of content.xml to Sweave.
+
+o Changed the odfWeave driver to re-encode the results from
+  Sweave back to UTF-8.
+
+Added a check to see if contents.xml can be converted to the
+current locale, and to print an error message if it can't.
+Previously, this would result in invalid XML and an obscure
+error message.
+
+Fixed the workDir argument to avoid deleting an existing
+directory and to handle relative paths properly.
+
+Added "MASS" as a "Suggested" package since it is used in an
+example.
+
+----------------------------------
 Version: 0.7.17
 Date: 2010-12-21
 

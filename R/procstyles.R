@@ -9,7 +9,10 @@ stylestraverse <- function(node)
       newstyles <- newStyleGen(getStyleDefs(), type='styles')
 
       # Append them to the list of other styles
-      xmlChildren(node) <- c(xmlChildren(node), newstyles)
+
+      # XXX work-around for XML 3.4 bug?
+      # xmlChildren(node) <- c(xmlChildren(node), newstyles)
+      node <- makeNode(node, c(xmlChildren(node), newstyles))
 
       # Return the modified node
       node
@@ -22,7 +25,10 @@ stylestraverse <- function(node)
       newstyles <- newStyleGen(getStyleDefs(), type='page')
 
       # Append them to the list of other automatic styles
-      xmlChildren(node) <- c(xmlChildren(node), newstyles)
+
+      # XXX work-around for XML 3.4 bug?
+      # xmlChildren(node) <- c(xmlChildren(node), newstyles)
+      node <- makeNode(node, c(xmlChildren(node), newstyles))
 
       # Return the modified node
       node
@@ -35,7 +41,10 @@ stylestraverse <- function(node)
       newstyles <- newStyleGen(getStyleDefs(), type='master')
 
       # Append them to the list of other master styles
-      xmlChildren(node) <- c(xmlChildren(node), newstyles)
+
+      # XXX work-around for XML 3.4 bug?
+      # xmlChildren(node) <- c(xmlChildren(node), newstyles)
+      node <- makeNode(node, c(xmlChildren(node), newstyles))
 
       # Return the modified node
       node
@@ -77,7 +86,10 @@ stylestraverse <- function(node)
       }
 
       # cat('assigning new children\n', file=stderr())
-      xmlChildren(node) <- newChildren
+
+      # XXX work-around for XML 3.4 bug?
+      # xmlChildren(node) <- newChildren
+      node <- makeNode(node, newChildren)
 
       node
    }

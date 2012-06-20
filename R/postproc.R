@@ -105,7 +105,10 @@ posttraverse <- function(node, seqenv)
             numsync <- if (is.na(numsync)) FALSE else strToBool(numsync)
             fmtval <- formatText(val, fmt, numsync)
             newnode <- xmlTextNode(fmtval)
-            xmlChildren(node) <- list(newnode)
+
+            # XXX work-around for XML 3.4 bug?
+            # xmlChildren(node) <- list(newnode)
+            node <- makeNode(node, list(newnode))
 
             # If this 'text:sequence' element has a reference name (it should)
             # then assign the formatted value of this sequence to "seqenv" using
@@ -139,7 +142,10 @@ posttraverse <- function(node, seqenv)
       dynstyles <- eapply(.odfEnv$newStyleEnv, function(style) style)
 
       # Append them to the list of other automatic styles
-      xmlChildren(node) <- c(xmlChildren(node), newstyles, dynstyles)
+
+      # XXX work-around for XML 3.4 bug?
+      # xmlChildren(node) <- c(xmlChildren(node), newstyles, dynstyles)
+      node <- makeNode(node, c(xmlChildren(node), newstyles, dynstyles))
 
       # Return the modified node
       node
@@ -170,7 +176,10 @@ posttraverse <- function(node, seqenv)
       newFonts <- lapply(fonts, fun)
 
       # Append the new 'style:font-face' element to the node's list of children
-      xmlChildren(node) <- c(xmlChildren(node), newFonts)
+
+      # XXX work-around for XML 3.4 bug?
+      # xmlChildren(node) <- c(xmlChildren(node), newFonts)
+      node <- makeNode(node, c(xmlChildren(node), newFonts))
 
       # Return the modified node
       node
@@ -215,7 +224,10 @@ posttraverse <- function(node, seqenv)
       }
 
       # cat('assigning new children\n', file=stderr())
-      xmlChildren(node) <- newChildren
+
+      # XXX work-around for XML 3.4 bug?
+      # xmlChildren(node) <- newChildren
+      node <- makeNode(node, newChildren)
 
       # Do any work on this node that needs to be done after all
       # of the children have been processed.
@@ -256,7 +268,10 @@ posttraverse_2 <- function(node, seqenv)
             value <- get(refname, pos=seqenv)
             # cat(sprintf('formatted value of sequence %s is %s\n', refname, value), file=stderr())
             newnode <- xmlTextNode(value)
-            xmlChildren(node) <- list(newnode)
+
+            # XXX work-around for XML 3.4 bug?
+            # xmlChildren(node) <- list(newnode)
+            node <- makeNode(node, list(newnode))
          },
          error=function(e)
          {
@@ -300,7 +315,10 @@ posttraverse_2 <- function(node, seqenv)
       }
 
       # cat('assigning new children\n', file=stderr())
-      xmlChildren(node) <- newChildren
+
+      # XXX work-around for XML 3.4 bug?
+      # xmlChildren(node) <- newChildren
+      node <- makeNode(node, newChildren)
 
       node
    }

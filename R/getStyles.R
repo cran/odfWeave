@@ -22,7 +22,7 @@ setStyles <- function(style)
 #            paste(required, collapse = ", "), "\n"))
 #   typeCounts <- table(styleNames)
 #   if(any(typeCounts > 1)) stop("only one style name can be declared here")
-  assign( "odfStyles",  style, env = .odfEnv)
+  assign( "odfStyles",  style, pos = .odfEnv)
 }
 
 
@@ -37,7 +37,7 @@ setStyleDefs <- function(def)
     stop(
          cat("There must be at least one style definintion for:",
              paste(required, collapse = ", "), "\n"))
-  assign( "styleDefs",  def, env = .odfEnv)
+  assign( "styleDefs",  def, pos = .odfEnv)
 }
 
 getImageDefs <- function() get("imageDefs", envir = .odfEnv)
@@ -80,5 +80,5 @@ setImageDefs <-
                 "inches by", def$plotWidth, "inches has been requested.\n"))
   }
   flush.console()
-  assign("imageDefs", def, env = .odfEnv)
+  assign("imageDefs", def, pos = .odfEnv)
 }

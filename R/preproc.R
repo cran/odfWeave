@@ -102,7 +102,10 @@ pretraverse <- function(node)
    }
 
    length(newChildren) <- numNewChildren
-   xmlChildren(node) <- newChildren
+
+   # XXX work-around for XML 3.4 bug?
+   # xmlChildren(node) <- newChildren
+   node <- makeNode(node, newChildren)
 
    node
 }
@@ -243,7 +246,10 @@ tdata <- function(node, chunks)
    }
 
    length(newChildren) <- numNewChildren
-   xmlChildren(node) <- newChildren
+
+   # XXX work-around for XML 3.4 bug?
+   # xmlChildren(node) <- newChildren
+   node <- makeNode(node, newChildren)
 
    node
 }

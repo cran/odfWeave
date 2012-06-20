@@ -1,3 +1,6 @@
+# This generates the path of a directory to use
+# in odfWeave.  It won't exist, as it is the job
+# of the odfWeave function to create it.
 odfTmpDir <- function()
 {
    tmpPath <- tempdir()
@@ -6,11 +9,6 @@ odfTmpDir <- function()
       format(Sys.time(), "%d%H%M%S"), 
       round(runif(1)*1000, 0),
       sep = "")
-   newPath <- paste(tmpPath, "/", suffix, sep = "")
-   if(!dir.create(newPath))
-      stop(paste(
-         "could not create",
-         newPath))
-   newPath
+   paste(tmpPath, "/", suffix, sep = "")
 }
 

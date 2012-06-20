@@ -11,7 +11,7 @@ Encoding(bullet) <- "UTF-8"
 assign(
        "picPath",
        NA,
-       env = .odfEnv)
+       pos = .odfEnv)
 
 assign(
        "imageDefs",
@@ -25,7 +25,7 @@ assign(
             dispWidth = 5,
             args = list()
             ),
-       env = .odfEnv)
+       pos = .odfEnv)
 
 
 assign(
@@ -43,7 +43,7 @@ assign(
             figureFrame = "basicFigFrame",
             page = "RlandscapePage"
             ),
-       env = .odfEnv)
+       pos = .odfEnv)
 
 assign(
        "styleDefs",
@@ -170,4 +170,4 @@ assign(
               marginTop = "1in",
               marginBottom = "1in")),
        
-       env = .odfEnv)
+       pos = .odfEnv)

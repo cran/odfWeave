@@ -1,4 +1,11 @@
 ----------------------------------
+Version: 0.8.2
+Date: 2012-11-15
+
+Fixed two corrupted image files in the examples directory
+
+
+----------------------------------
 Version: 0.8.0
 Date: 2012-6-19
 

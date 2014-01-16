@@ -212,8 +212,7 @@ RweaveOdfWritedoc <- function(object, chunk)
     {
         opts <- sub(paste(".*", object$syntax$docopt, ".*", sep=""),
                     "\\1", chunk[pos[1]])
-        object$options <- utils:::SweaveParseOptions(opts, object$options,
-                                             RweaveOdfOptions)
+        object$options <- SweaveParseOptions(opts, object$options, RweaveOdfOptions)
         chunk[pos[1]] <- sub(object$syntax$docopt, "", chunk[pos[1]])
     }
 

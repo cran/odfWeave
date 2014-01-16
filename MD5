@@ -1,6 +1,7 @@
-bb930e4cad209941fafa9351b95ecbaf *DESCRIPTION
-33baa18c60d086e0c107029f51aaac80 *NAMESPACE
-6536dd5fe787c4c59920c95c020bb31a *R/RweaveOdf.R
+1a9129f14d905b4abb72926781f610ff *DESCRIPTION
+39e488c2b5e0b50c1e858731cfc5435f *NAMESPACE
+39aa04de9126e1a458a01eb43e43c9d1 *R/RweaveOdf.R
+d2809803601b4620b803be9a7067bc54 *R/SweaveParseOptions.R
 c3da16c3cdde0142941cf67544c721f7 *R/adjustImageSize.R
 7335ff85525aa6ce0a5a0b59a443fd5e *R/chunks.R
 166f12ae72d55f989e9d1f1e6a156ba9 *R/codechunk.R
@@ -48,11 +49,11 @@ a2eb9df65f59db6e9a756f2df027769a *R/treeapply.R
 09a0272f42b6fed1087b25bd8b9f362a *R/uniqueName.R
 07307ee35221bb9de0de960a7ed34b82 *R/writeXML.R
 ea65cc8c13d0452994a850ee91b45fdf *R/xmlUtils.R
-87d90ccbd4b4d341274948be0bf27c67 *inst/CHANGES
-520738f55508b33a96bb68f875dde195 *inst/doc/RnewsExample.pdf
-d2730406b746c54710715a6f7637aa68 *inst/doc/RnewsOut.pdf
+16d6886a2d0755b529e3939be3c5140b *build/vignette.rds
+86700136561787bedf31612a0a88ffe9 *inst/CHANGES
+30e10f9164fdae0fcba646781f6215be *inst/doc/odfWeave.R
 de3a937e399d85bc9d3192a22344fa0f *inst/doc/odfWeave.Rnw
-9b037801938193925f661c98ee8c9a27 *inst/doc/odfWeave.pdf
+689194b397764d42befd9957bb26879f *inst/doc/odfWeave.pdf
 12ceb13edb4814694be9ead524be216a *inst/examples/Frink.png
 cd976f2ab4a0947e65eb97fd4cb1ba38 *inst/examples/RunFormatting.R
 16523e4dc06cae1b46631a0267b999a7 *inst/examples/examples.odt
@@ -87,4 +88,6 @@ f47f9a82c9b9902a5a88d1a2ba330b4d *man/odfTableCaption.Rd
 3942a53eaac90de4fe77f53ea472c8a5 *man/pkgVersions.Rd
 a255eaed947baf8cf4bcb1f547c12a05 *man/styles.Rd
 59fe78579b35ad570e8344232f8e879e *man/tableStyles.Rd
-013495b53831bbc6a82ef57e290bcee8 *odfWeave-Ex.R
+520738f55508b33a96bb68f875dde195 *vignettes/RnewsExample.pdf
+d2730406b746c54710715a6f7637aa68 *vignettes/RnewsOut.pdf
+de3a937e399d85bc9d3192a22344fa0f *vignettes/odfWeave.Rnw
